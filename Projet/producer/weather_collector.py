@@ -67,7 +67,7 @@ def format_message(raw: dict, lat: float, lon: float) -> dict:
 
 
 def send_to_kafka(message: dict) -> None:
-    """producer = KafkaProducer(
+    producer = KafkaProducer(
         bootstrap_servers=KAFKA_BROKER,
         value_serializer=lambda v: json.dumps(v).encode("utf-8"),
         key_serializer=lambda k: k.encode("utf-8"),
@@ -82,9 +82,36 @@ def send_to_kafka(message: dict) -> None:
     print(
         f"[OK] Message envoyé → topic={record_metadata.topic} "
         f"partition={record_metadata.partition} offset={record_metadata.offset}"
-    )"""
-    #placeholder for Kafka producer, to avoid errors in environments without Kafka setup
-    print(f"[MOCK] Envoi à Kafka : {json.dumps(message, indent=2, ensure_ascii=False)}")
+    )
+   
+
+def fetch_weather_mock(lat: float, lon: float) -> dict:
+    return {
+        "timestamp": "2026-05-24T14:36:11.823271+00:00",
+        "coordinates": {
+            "lat": 48.8566,
+            "lon": 2.0
+        },
+        "location": "Chavenay",
+        "country": "FR",
+        "weather": {
+            "condition": "Clear",
+            "description": "ciel dégagé",
+            "temperature_c": 30.78,
+            "feels_like_c": 30.63,
+            "temp_min_c": 29.66,
+            "temp_max_c": 32.27,
+            "humidity_pct": 40,
+            "pressure_hpa": 1028,
+            "wind_speed_ms": 4.63,
+            "wind_direction_deg": 40,
+            "wind_gust_ms": None,
+            "visibility_m": 10000,
+            "clouds_pct": 0,
+            "rain_1h_mm": None,
+            "snow_1h_mm": None
+        }
+        }
 
 
 def main():
@@ -107,7 +134,7 @@ def main():
     print(f"[INFO] Récupération météo pour lat={args.lat}, lon={args.lon} ...")
 
     try:
-        raw_data = fetch_weather(args.lat, args.lon)
+        raw_data = fetch_weather_mock(args.lat, args.lon)
     except requests.HTTPError as e:
         print(f"[ERREUR] API OpenWeatherMap : {e}", file=sys.stderr)
         sys.exit(1)
@@ -115,7 +142,8 @@ def main():
         print(f"[ERREUR] Réseau : {e}", file=sys.stderr)
         sys.exit(1)
 
-    message = format_message(raw_data, args.lat, args.lon)
+    message = raw_data
+    #message = format_message(raw_data, args.lat, args.lon)
     print(f"[INFO] Données formatées : {json.dumps(message, indent=2, ensure_ascii=False)}")
 
     try:
