@@ -4,7 +4,7 @@ from typing import Optional
 
 from models import Weather
 
-from mobile_app.logic.thi_calculator import ThiCalculator
+from logic.thi_calculator import ThiCalculator
 
 
 class WeatherNotifier:

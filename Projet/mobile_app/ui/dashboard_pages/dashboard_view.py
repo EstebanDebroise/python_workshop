@@ -7,13 +7,13 @@ import flet as ft
 import theme
 from models import Weather
 from ui.base import Buildable
-from mobile_app.ui.dashboard_pages.bottom_nav_section import BottomNavSection
+from ui.dashboard_pages.bottom_nav_section import BottomNavSection
 from ui.components import UIComponents
-from mobile_app.ui.dashboard_pages.current_weather_section import CurrentWeatherSection
-from mobile_app.ui.dashboard_pages.header_section import HeaderSection
-from mobile_app.ui.dashboard_pages.pasture_section import PastureSection
-from mobile_app.ui.dashboard_pages.thi_section import ThiSection
-from mobile_app.ui.dashboard_pages.treatment_section import TreatmentSection
+from ui.dashboard_pages.current_weather_section import CurrentWeatherSection
+from ui.dashboard_pages.header_section import HeaderSection
+from ui.dashboard_pages.pasture_section import PastureSection
+from ui.dashboard_pages.thi_section import ThiSection
+from ui.dashboard_pages.treatment_section import TreatmentSection
 
 
 class DashboardView(Buildable):

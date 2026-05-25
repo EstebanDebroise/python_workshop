@@ -7,8 +7,8 @@ from typing import Iterable
 import flet as ft
 
 import theme
-from mobile_app.logic.pasture_alert import PastureAlert
-from mobile_app.logic.pasture_analyzer import PastureAnalyzer
+from logic.pasture_alert import PastureAlert
+from logic.pasture_analyzer import PastureAnalyzer
 from models import Weather
 from ui.badge import Badge
 from ui.base import WeatherSection
@@ -91,7 +91,7 @@ class PastureSection(WeatherSection):
 
         Si l'écart entre ressenti et température réelle est ≥ 2°C, une ligne
         contextuelle est affichée. Les alertes métier sont recalculées via
-        :func:`analytics.pasture_alerts` et rendues via :meth:`_render_pasture_alerts`.
+        :func:`PastureAnalyzer.alerts` et rendues via :meth:`_render_pasture_alerts`.
         Le badge passe à VIGILANCE dès qu'au moins une alerte est présente.
 
         Args:
@@ -154,7 +154,7 @@ class PastureSection(WeatherSection):
         ``"cold"`` → bandeau bleu, ``"sun"`` → bandeau jaune, autre → bandeau ambre.
 
         Args:
-            alerts (Iterable[PastureAlert]): Alertes issues de :func:`analytics.pasture_alerts`,
+            alerts (Iterable[PastureAlert]): Alertes issues de :func:`PastureAnalyzer.alerts`,
                 chacune portant un ``icon``, un ``message`` et un ``kind``.
 
         Returns:

@@ -14,11 +14,11 @@ import re
 import flet as ft
 
 import theme
-from mobile_app.logic.analytics import change_notifications
+from logic.weather_notifier import WeatherNotifier
 from kafka_client import WeatherConsumer
 from models import Weather
-from mobile_app.ui.dashboard_pages.dashboard_view import DashboardView
-from mobile_app.ui.conexion_pages.setup_view import SetupResult, SetupView
+from ui.dashboard_pages.dashboard_view import DashboardView
+from ui.conexion_pages.setup_view import SetupResult, SetupView
 
 KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP", "localhost:9092")
 
@@ -93,7 +93,7 @@ class WeatherApp:
         if self.dashboard is None:
             return
         self.dashboard.update_weather(w)
-        for msg in change_notifications(self.prev_weather, w):
+        for msg in WeatherNotifier.change_notifications(self.prev_weather, w):
             self._notify(msg)
         self.prev_weather = w
         self.page.update()
@@ -105,11 +105,11 @@ class WeatherApp:
         except Exception:
             pass
 
-
-def main(page: ft.Page) -> None:
-    """Point d'entrée appelé par ``ft.app`` pour chaque session utilisateur."""
-    WeatherApp(page)
+    @staticmethod
+    def main(page: ft.Page) -> None:
+        """Point d'entrée appelé par ``ft.app`` pour chaque session utilisateur."""
+        WeatherApp(page)
 
 
 if __name__ == "__main__":
-    ft.app(target=main)
+    ft.app(target=WeatherApp.main)

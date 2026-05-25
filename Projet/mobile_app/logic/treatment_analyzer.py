@@ -5,7 +5,7 @@ from typing import Optional
 
 from models import Weather
 
-from mobile_app.logic.treatment_slot import SlotStatus, TreatmentSlot
+from logic.treatment_slot import SlotStatus, TreatmentSlot
 
 
 class TreatmentAnalyzer:

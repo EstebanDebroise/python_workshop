@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from models import Weather
 
-from mobile_app.logic.pasture_alert import PastureAlert
+from logic.pasture_alert import PastureAlert
 
 
 class PastureAnalyzer:

@@ -5,8 +5,8 @@ from __future__ import annotations
 import flet as ft
 
 import theme
-from mobile_app.logic.treatment_analyzer import TreatmentAnalyzer
-from mobile_app.logic.treatment_slot import TreatmentSlot
+from logic.treatment_analyzer import TreatmentAnalyzer
+from logic.treatment_slot import TreatmentSlot
 from models import Weather
 from ui.badge import Badge
 from ui.base import WeatherSection
@@ -17,7 +17,7 @@ class TreatmentSection(WeatherSection):
     """Carte de pulvérisation affichant 3 créneaux horaires évalués et leur légende.
 
     Implémente :class:`WeatherSection`. Les créneaux (−2h / maintenant / +3h)
-    sont recalculés à chaque nouvelle mesure via :func:`analytics.treatment_slots`.
+    sont recalculés à chaque nouvelle mesure via :func:`TreatmentAnalyzer.slots`.
     Chaque créneau est affiché avec un code couleur (optimal / risqué / déconseillé).
     Le badge récapitule le nombre de créneaux jugés optimaux.
     """
@@ -95,7 +95,7 @@ class TreatmentSection(WeatherSection):
     def update(self, w: Weather) -> None:
         """Recalcule les 3 créneaux de pulvérisation et met à jour le badge récapitulatif.
 
-        Délègue le calcul à :func:`analytics.treatment_slots` puis reconstruit
+        Délègue le calcul à :func:`TreatmentAnalyzer.slots` puis reconstruit
         la liste des lignes visuelles via :meth:`_render_slot`. Le badge affiche
         le nombre de créneaux optimaux ou « AUCUN » si aucun n'est disponible.
 

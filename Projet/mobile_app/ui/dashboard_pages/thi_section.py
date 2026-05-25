@@ -5,8 +5,8 @@ from __future__ import annotations
 import flet as ft
 
 import theme
-from mobile_app.logic.thi_calculator import ThiCalculator
-from mobile_app.logic.thi_result import ThiResult
+from logic.thi_calculator import ThiCalculator
+from logic.thi_result import ThiResult
 from models import Weather
 from ui.badge import Badge
 from ui.base import WeatherSection
@@ -130,7 +130,7 @@ class ThiSection(WeatherSection):
     def update(self, w: Weather) -> None:
         """Recalcule le THI, met à jour la jauge et affiche ou masque l'alerte danger.
 
-        Le THI est calculé via :func:`analytics.thi_result` à partir de la température
+        Le THI est calculé via :meth:`ThiCalculator.result` à partir de la température
         et de l'humidité. La jauge est normalisée sur la plage [50, 90]. En zone
         danger, deux bandeaux d'alerte (rouge + info) apparaissent dans ``_alert_zone``.
 

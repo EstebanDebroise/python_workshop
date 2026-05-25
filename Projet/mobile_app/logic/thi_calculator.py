@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from mobile_app.logic.thi_result import ThiResult
+from logic.thi_result import ThiResult
 
 
 class ThiCalculator:

@@ -8,7 +8,7 @@ from datetime import datetime
 import flet as ft
 
 import theme
-from mobile_app.logic.weather_icons import WeatherIcons
+from logic.weather_icons import WeatherIcons
 from models import Weather
 from ui.base import WeatherSection
 from ui.components import UIComponents
