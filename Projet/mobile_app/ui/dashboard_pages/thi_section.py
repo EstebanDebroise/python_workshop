@@ -5,7 +5,8 @@ from __future__ import annotations
 import flet as ft
 
 import theme
-from analytics import ThiResult, thi_result
+from mobile_app.logic.thi_calculator import ThiCalculator
+from mobile_app.logic.thi_result import ThiResult
 from models import Weather
 from ui.badge import Badge
 from ui.base import WeatherSection
@@ -140,7 +141,7 @@ class ThiSection(WeatherSection):
         Returns:
             None — les contrôles Flet sont modifiés en place.
         """
-        result: ThiResult = thi_result(w.temperature_c, w.humidity_pct)
+        result: ThiResult = ThiCalculator.result(w.temperature_c, w.humidity_pct)
         color = UIComponents.COLOR_TOKENS[result.color_token]
 
         self._value.value = f"{result.value:.0f}"

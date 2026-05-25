@@ -8,7 +8,7 @@ from datetime import datetime
 import flet as ft
 
 import theme
-from analytics import icon_for_condition
+from mobile_app.logic.weather_icons import WeatherIcons
 from models import Weather
 from ui.base import WeatherSection
 from ui.components import UIComponents
@@ -181,7 +181,7 @@ class CurrentWeatherSection(WeatherSection):
         self._temp.value = f"{w.temperature_c:.0f}°C"
         self._desc.value = f"{w.description.capitalize()} · {self._pretty_ts(w.timestamp)}"
 
-        icon, token = icon_for_condition(w.condition)
+        icon, token = WeatherIcons.for_condition(w.condition)
         self._icon.name = UIComponents.icon_name(icon)
         self._icon.color = UIComponents.COLOR_TOKENS[token]
 
@@ -210,7 +210,7 @@ class CurrentWeatherSection(WeatherSection):
             if i < len(items):
                 w = items[i]
                 d["label"].value = self._hour_or_dash(w.timestamp)
-                ico_name, token = icon_for_condition(w.condition)
+                ico_name, token = WeatherIcons.for_condition(w.condition)
                 d["icon"].name = UIComponents.icon_name(ico_name)
                 d["icon"].color = UIComponents.COLOR_TOKENS[token]
                 d["hi"].value = f"{w.temperature_c:.0f}°"

@@ -7,7 +7,8 @@ from typing import Iterable
 import flet as ft
 
 import theme
-from analytics import PastureAlert, pasture_alerts
+from mobile_app.logic.pasture_alert import PastureAlert
+from mobile_app.logic.pasture_analyzer import PastureAnalyzer
 from models import Weather
 from ui.badge import Badge
 from ui.base import WeatherSection
@@ -139,7 +140,7 @@ class PastureSection(WeatherSection):
         else:
             self._feels_row.visible = False
 
-        self._alerts.controls = list(self._render_pasture_alerts(pasture_alerts(w)))
+        self._alerts.controls = list(self._render_pasture_alerts(PastureAnalyzer.alerts(w)))
         if not self._alerts.controls:
             self.badge.update("OK", "ok")
         else:

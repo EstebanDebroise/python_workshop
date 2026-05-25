@@ -5,7 +5,8 @@ from __future__ import annotations
 import flet as ft
 
 import theme
-from analytics import TreatmentSlot, treatment_slots
+from mobile_app.logic.treatment_analyzer import TreatmentAnalyzer
+from mobile_app.logic.treatment_slot import TreatmentSlot
 from models import Weather
 from ui.badge import Badge
 from ui.base import WeatherSection
@@ -106,7 +107,7 @@ class TreatmentSection(WeatherSection):
         Returns:
             None — les contrôles Flet sont modifiés en place.
         """
-        slots = treatment_slots(w)
+        slots = TreatmentAnalyzer.slots(w)
         self._slots.controls = [self._render_slot(s) for s in slots]
         ok_count = sum(1 for s in slots if s.status == "ok")
         if ok_count:

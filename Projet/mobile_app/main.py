@@ -14,11 +14,11 @@ import re
 import flet as ft
 
 import theme
-from analytics import change_notifications
+from mobile_app.logic.analytics import change_notifications
 from kafka_client import WeatherConsumer
 from models import Weather
-from ui.dashboard_view import DashboardView
-from ui.setup_view import SetupResult, SetupView
+from mobile_app.ui.dashboard_pages.dashboard_view import DashboardView
+from mobile_app.ui.conexion_pages.setup_view import SetupResult, SetupView
 
 KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP", "localhost:9092")
 
