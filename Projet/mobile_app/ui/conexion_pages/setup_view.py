@@ -1,4 +1,4 @@
-"""Écran de saisie initial : ville + profil utilisateur."""
+"""Écran de configuration initiale : saisie de la ville et du profil utilisateur."""
 
 from __future__ import annotations
 
@@ -8,28 +8,49 @@ from typing import Callable
 import flet as ft
 
 import theme
-from ui.components import card
+from ui.base import Buildable
+from ui.components import UIComponents
 
 
 @dataclass
 class SetupResult:
-    """Données collectées par l'écran de configuration."""
+    """Données collectées par l'écran de configuration et transmises à l'orchestrateur.
+
+    Attributs :
+        city (str): Nom de la ville saisi par l'utilisateur, non normalisé.
+            La normalisation en topic Kafka est effectuée par l'appelant.
+        profile (str): Profil utilisateur sélectionné dans le menu déroulant
+            (ex. ``"Éleveur laitier"``, ``"Agriculteur"``).
+    """
 
     city: str
     profile: str
 
 
-class SetupView:
+class SetupView(Buildable):
     """Vue de configuration initiale de l'application.
 
-    Affiche un formulaire centré (ville + profil) et déclenche le
-    callback ``on_submit`` avec un :class:`SetupResult` quand l'utilisateur
-    valide. La vue est passive : elle ne gère pas Kafka ni la navigation,
-    elle se contente de remonter la saisie à l'orchestrateur.
+    Implémente :class:`Buildable`. Affiche un formulaire centré composé d'un
+    champ texte pour la ville et d'un menu déroulant pour le profil. Déclenche
+    le callback ``on_submit`` avec un :class:`SetupResult` lors de la validation.
+
+    La vue est passive : elle ne gère ni Kafka ni la navigation entre écrans.
+    Elle se contente de valider la saisie minimale (ville non vide) et de
+    remonter les données à l'orchestrateur (:class:`WeatherApp`).
     """
 
     def __init__(self, on_submit: Callable[[SetupResult], None]) -> None:
-        """Prépare les contrôles ; ne les attache pas encore à la page."""
+        """Prépare les contrôles du formulaire sans les attacher à la page.
+
+        Args:
+            on_submit (Callable[[SetupResult], None]): Callback appelé lors de la
+                validation du formulaire. Reçoit un :class:`SetupResult` contenant
+                la ville et le profil saisis. L'appelant est responsable de la
+                transition vers le dashboard.
+
+        Returns:
+            None — :meth:`build` doit être appelé pour obtenir le contrôle Flet.
+        """
         self.on_submit = on_submit
         self._city = ft.TextField(
             label="Ville",
@@ -53,7 +74,18 @@ class SetupView:
         self._error = ft.Text("", color=theme.RED, size=12)
 
     def build(self) -> ft.Control:
-        """Construit et renvoie l'arbre Flet de la vue (à ajouter à la page)."""
+        """Construit l'arbre Flet complet de l'écran de configuration.
+
+        Produit une page centrée avec le logo, le sous-titre de l'application
+        et la carte de formulaire (ville + profil + bouton Démarrer).
+
+        Args:
+            Aucun.
+
+        Returns:
+            ft.Control: ``Container`` expansif avec fond gris (``theme.BG``),
+                centré horizontalement, contenant le logo et le formulaire de saisie.
+        """
         return ft.Container(
             expand=True,
             bgcolor=theme.BG,
@@ -64,23 +96,31 @@ class SetupView:
                     ft.Row(
                         [
                             ft.Icon(ft.Icons.AGRICULTURE, color=theme.GREEN, size=36),
-                            ft.Text("Météo Agri", size=28, weight=ft.FontWeight.BOLD, color=theme.GREEN),
+                            ft.Text(
+                                "Météo Agri",
+                                size=28,
+                                weight=ft.FontWeight.BOLD,
+                                color=theme.GREEN,
+                            ),
                         ],
                         alignment=ft.MainAxisAlignment.CENTER,
                         spacing=10,
                     ),
                     ft.Text(
                         "Tableau de bord météo dédié aux agriculteurs et éleveurs",
-                        size=13, color=theme.MUTED, text_align=ft.TextAlign.CENTER,
+                        size=13,
+                        color=theme.MUTED,
+                        text_align=ft.TextAlign.CENTER,
                     ),
                     ft.Container(height=30),
-                    card(
+                    UIComponents.card(
                         ft.Column(
                             [
                                 ft.Text("Configuration", size=14, weight=ft.FontWeight.W_600),
                                 ft.Text(
                                     "Le topic Kafka utilisé portera le nom de la ville.",
-                                    size=11, color=theme.MUTED,
+                                    size=11,
+                                    color=theme.MUTED,
                                 ),
                                 ft.Container(height=4),
                                 self._city,
@@ -107,11 +147,18 @@ class SetupView:
         )
 
     def _submit(self) -> None:
-        """Valide la saisie puis transmet le résultat via ``on_submit``.
+        """Valide la saisie et transmet le résultat via le callback ``on_submit``.
 
-        Affiche une erreur en place si le champ ville est vide ; sinon
-        n'effectue aucun nettoyage particulier (la normalisation du
-        nom de topic est faite par l'appelant).
+        Vérifie que le champ ville n'est pas vide. En cas d'erreur, affiche un
+        message en place et interrompt la soumission. En cas de succès, appelle
+        ``on_submit`` avec le :class:`SetupResult` construit à partir des valeurs
+        saisies. Le profil par défaut est ``"Agriculteur"`` si rien n'est sélectionné.
+
+        Args:
+            Aucun.
+
+        Returns:
+            None — appelle ``on_submit`` en cas de succès, met à jour ``_error`` sinon.
         """
         city = (self._city.value or "").strip()
         if not city:
