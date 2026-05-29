@@ -7,12 +7,14 @@ from typing import Callable, Optional
 import flet as ft
 
 import theme
+from logic.notification_service import NotificationService
 from models import Weather
 from ui.base import Buildable
 from ui.dashboard_pages.bottom_nav_section import BottomNavSection
 from ui.components import UIComponents
 from ui.dashboard_pages.current_weather_section import CurrentWeatherSection
 from ui.dashboard_pages.header_section import HeaderSection
+from ui.dashboard_pages.notifications_view import NotificationsView
 from ui.dashboard_pages.pasture_section import PastureSection
 from ui.dashboard_pages.settings_view import SettingsView
 from ui.dashboard_pages.thi_section import ThiSection
@@ -30,9 +32,9 @@ class DashboardView(Buildable):
     - :class:`TreatmentSection` : créneaux de pulvérisation ;
     - :class:`BottomNavSection` : barre de navigation inférieure.
 
-    Gère la navigation entre le dashboard et la page de réglages via la barre
-    inférieure. Expose :meth:`update_weather` et :meth:`set_status` pour les
-    mises à jour en temps réel.
+    Gère la navigation entre le dashboard, la page Alertes et la page de réglages
+    via la barre inférieure. Expose :meth:`update_weather` et :meth:`set_status`
+    pour les mises à jour en temps réel.
     """
 
     def __init__(
@@ -40,6 +42,7 @@ class DashboardView(Buildable):
         city: str,
         profile: str,
         topic: str,
+        notification_service: NotificationService,
         on_settings_save: Optional[Callable[[str, str], None]] = None,
     ) -> None:
         """Instancie chaque sous-section et prépare la zone de contenu permutable.
@@ -48,6 +51,8 @@ class DashboardView(Buildable):
             city (str): Nom de la ville affiché dans le header.
             profile (str): Profil utilisateur affiché en sous-titre du header.
             topic (str): Nom du topic Kafka pour la ligne de statut initiale.
+            notification_service (NotificationService): Service partagé pilotant
+                l'activation et l'envoi des notifications, fourni à la page Alertes.
             on_settings_save (Callable[[str, str], None] | None): Callback optionnel
                 appelé avec ``(city, profile)`` quand l'utilisateur enregistre ses
                 réglages. Permet à l'orchestrateur parent de relancer le consumer Kafka.
@@ -57,6 +62,7 @@ class DashboardView(Buildable):
         """
         self._current_city = city
         self._current_profile = profile
+        self._notification_service = notification_service
         self._on_settings_save_cb = on_settings_save
 
         self.header = HeaderSection(city, profile, topic)
@@ -74,6 +80,7 @@ class DashboardView(Buildable):
         )
         self._bottom_nav = BottomNavSection(
             on_dashboard=self._nav_to_dashboard,
+            on_alerts=self._nav_to_alerts,
             on_settings=self._nav_to_settings,
         )
 
@@ -95,6 +102,11 @@ class DashboardView(Buildable):
 
     def _nav_to_dashboard(self) -> None:
         self._body.content = self._dashboard_ctrl
+        self._body.update()
+
+    def _nav_to_alerts(self) -> None:
+        alerts = NotificationsView(self._notification_service)
+        self._body.content = alerts.build()
         self._body.update()
 
     def _nav_to_settings(self) -> None:

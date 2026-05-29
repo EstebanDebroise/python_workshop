@@ -19,6 +19,7 @@ import flet as ft
 import requests
 
 import theme
+from logic.notification_service import NotificationService
 from logic.weather_notifier import WeatherNotifier
 from api_client import ApiWeatherClient
 from models import Weather
@@ -42,6 +43,7 @@ class WeatherApp:
         self.prev_weather: Weather | None = None
         self.dashboard: DashboardView | None = None
         self.client: ApiWeatherClient | None = None
+        self.notifications = NotificationService(page)
         self._configure_page()
         self._show_setup()
 
@@ -70,7 +72,11 @@ class WeatherApp:
     def _show_dashboard(self, city: str, profile: str, topic: str) -> None:
         """Instancie le dashboard, remplace les contrôles et active le scroll."""
         self.dashboard = DashboardView(
-            city, profile, topic, on_settings_save=self._on_settings_save
+            city,
+            profile,
+            topic,
+            notification_service=self.notifications,
+            on_settings_save=self._on_settings_save,
         )
         self.page.scroll = ft.ScrollMode.AUTO
         self.page.controls.clear()
@@ -134,21 +140,21 @@ class WeatherApp:
         self.page.update()
 
     def _on_new_weather(self, w: Weather) -> None:
-        """Met à jour le dashboard et émet les notifications de changement."""
+        """Met à jour le dashboard et émet les notifications de changement.
+
+        Les messages d'alerte sont délégués au :class:`NotificationService`, qui
+        n'émet une notification (système Android ou SnackBar de repli) que si
+        l'utilisateur les a activées dans l'onglet Alertes. Le polling tourne dans
+        un thread daemon : les alertes sont donc évaluées en continu, quelle que
+        soit la page affichée.
+        """
         if self.dashboard is None:
             return
         self.dashboard.update_weather(w)
         for msg in WeatherNotifier.change_notifications(self.prev_weather, w):
-            self._notify(msg)
+            self.notifications.notify("Météo Agri", msg)
         self.prev_weather = w
         self.page.update()
-
-    def _notify(self, message: str) -> None:
-        """Affiche une SnackBar rouge ; ignore silencieusement toute erreur Flet."""
-        try:
-            self.page.open(ft.SnackBar(ft.Text(message), bgcolor=theme.RED))
-        except Exception:
-            pass
 
     @staticmethod
     def main(page: ft.Page) -> None:
