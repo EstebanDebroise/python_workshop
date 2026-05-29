@@ -146,6 +146,23 @@ class PastureSection(WeatherSection):
         else:
             self.badge.update("VIGILANCE", "warn")
 
+    def reset(self) -> None:
+        """Remet les 4 indicateurs, la ligne ressenti et les alertes à leur état d'attente.
+
+        Args:
+            Aucun.
+
+        Returns:
+            None — les contrôles Flet sont modifiés en place.
+        """
+        self._temp.value = "--"
+        self._feels.value = "--"
+        self._wind.value = "--"
+        self._clouds.value = "--"
+        self._feels_row.visible = False
+        self._alerts.controls = []
+        self.badge.update("—", "ok")
+
     @staticmethod
     def _render_pasture_alerts(alerts: Iterable[PastureAlert]) -> Iterable[ft.Control]:
         """Convertit une liste d'alertes métier en bandeaux Flet colorés selon leur type.

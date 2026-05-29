@@ -115,6 +115,18 @@ class TreatmentSection(WeatherSection):
         else:
             self.badge.update("AUCUN", "danger")
 
+    def reset(self) -> None:
+        """Vide la liste des créneaux et remet le badge à son état d'attente.
+
+        Args:
+            Aucun.
+
+        Returns:
+            None — les contrôles Flet sont modifiés en place.
+        """
+        self._slots.controls = []
+        self.badge.update("—", "ok")
+
     @staticmethod
     def _render_slot(s: TreatmentSlot) -> ft.Container:
         """Construit la ligne visuelle d'un créneau avec son code couleur.

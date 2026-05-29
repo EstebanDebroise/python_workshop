@@ -78,13 +78,20 @@ class WeatherApp:
         self.page.update()
 
     def _on_settings_save(self, city: str, profile: str) -> None:
-        """Applique les nouveaux réglages : enregistre le lieu, met à jour le header, relance le client."""
+        """Applique les nouveaux réglages lors d'un changement de lieu.
+
+        Enregistre le nouveau lieu auprès de l'API, met à jour le header, vide les
+        données affichées de l'ancien lieu (``reset_data``) puis relance le client
+        API sur le nouveau topic — ce qui déclenche immédiatement une requête pour
+        récupérer les bonnes données.
+        """
         topic = re.sub(r"[^A-Za-z0-9_.\-]", "_", city.lower())
         self._register_location(city)
+        self.prev_weather = None
         if self.dashboard is not None:
             self.dashboard.header.update_info(city, profile, topic)
+            self.dashboard.reset_data()
             self.page.update()
-        self.prev_weather = None
         self._start_client(topic)
 
     def _start_client(self, topic: str) -> None:

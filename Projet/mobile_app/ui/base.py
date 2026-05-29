@@ -65,3 +65,16 @@ class WeatherSection(Buildable):
         Returns:
             None
         """
+
+    @abstractmethod
+    def reset(self) -> None:
+        """Réinitialise la section à son état d'attente (avant toute mesure).
+
+        Vide les données accumulées (historique, alertes…) et remet les contrôles
+        Flet aux valeurs par défaut affichées au démarrage. Utilisé lors d'un
+        changement de lieu pour ne pas mélanger les données de deux localisations.
+        Les contrôles sont modifiés en place ; l'appelant déclenche ``page.update()``.
+
+        Returns:
+            None
+        """

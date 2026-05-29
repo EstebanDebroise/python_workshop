@@ -138,6 +138,25 @@ class DashboardView(Buildable):
         self.pasture.update(w)
         self.treatment.update(w)
 
+    def reset_data(self) -> None:
+        """Réinitialise les quatre sections à leur état d'attente.
+
+        Vide les données accumulées (historique, alertes, créneaux…) afin de ne pas
+        afficher les mesures de l'ancien lieu après un changement de localisation.
+        Le rafraîchissement réel à l'écran est déclenché par l'appelant via
+        ``page.update()``.
+
+        Args:
+            Aucun.
+
+        Returns:
+            None
+        """
+        self.current.reset()
+        self.thi.reset()
+        self.pasture.reset()
+        self.treatment.reset()
+
     def set_status(self, text: str) -> None:
         """Relaie un message de statut de connexion Kafka au header du dashboard.
 

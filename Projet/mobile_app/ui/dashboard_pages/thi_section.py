@@ -170,3 +170,22 @@ class ThiSection(WeatherSection):
             self._alert_zone.visible = True
         else:
             self._alert_zone.visible = False
+
+    def reset(self) -> None:
+        """Remet la jauge THI, la zone de confort et l'alerte à leur état d'attente.
+
+        Args:
+            Aucun.
+
+        Returns:
+            None — les contrôles Flet sont modifiés en place.
+        """
+        self._value.value = "--"
+        self._value.color = theme.RED
+        self._ring.value = 0
+        self._ring.color = theme.RED
+        self._status.value = "—"
+        self._status.color = theme.RED
+        self._desc.value = "En attente de données."
+        self.badge.update("—", "ok")
+        self._alert_zone.visible = False

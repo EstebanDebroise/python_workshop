@@ -192,6 +192,25 @@ class CurrentWeatherSection(WeatherSection):
 
         self._refresh_history()
 
+    def reset(self) -> None:
+        """Vide l'historique et remet la carte météo à son état d'attente.
+
+        Args:
+            Aucun.
+
+        Returns:
+            None — les contrôles Flet sont modifiés en place.
+        """
+        self.history.clear()
+        self._temp.value = "--°C"
+        self._desc.value = "En attente…"
+        self._icon.name = UIComponents.icon_name(ft.Icons.WB_SUNNY)
+        self._icon.color = "#F59E0B"
+        self._chip_hum.value = "--%"
+        self._chip_wind.value = "-- m/s"
+        self._chip_feel.value = "--°C ressenti"
+        self._refresh_history()
+
     def _refresh_history(self) -> None:
         """Reflète l'état courant de la file d'historique dans les cellules du ruban.
 
@@ -216,6 +235,8 @@ class CurrentWeatherSection(WeatherSection):
                 d["hi"].value = f"{w.temperature_c:.0f}°"
             else:
                 d["label"].value = "—"
+                d["icon"].name = UIComponents.icon_name(ft.Icons.WB_SUNNY)
+                d["icon"].color = "#F59E0B"
                 d["hi"].value = "--°"
 
     @staticmethod
