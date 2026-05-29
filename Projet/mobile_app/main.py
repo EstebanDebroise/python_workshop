@@ -63,11 +63,24 @@ class WeatherApp:
 
     def _show_dashboard(self, city: str, profile: str, topic: str) -> None:
         """Instancie le dashboard, remplace les contrôles et active le scroll."""
-        self.dashboard = DashboardView(city, profile, topic)
+        self.dashboard = DashboardView(
+            city, profile, topic, on_settings_save=self._on_settings_save
+        )
         self.page.scroll = ft.ScrollMode.AUTO
         self.page.controls.clear()
         self.page.add(self.dashboard.build())
         self.page.update()
+
+    def _on_settings_save(self, city: str, profile: str) -> None:
+        """Applique les nouveaux réglages : met à jour le header et relance le consumer."""
+        topic = re.sub(r"[^A-Za-z0-9_.\-]", "_", city.lower())
+        if self.consumer is not None:
+            self.consumer.stop()
+        if self.dashboard is not None:
+            self.dashboard.header.update_info(city, profile, topic)
+            self.page.update()
+        self.prev_weather = None
+        self._start_consumer(topic)
 
     def _start_consumer(self, topic: str) -> None:
         """Crée et lance le :class:`WeatherConsumer` lié au topic demandé."""

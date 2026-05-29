@@ -33,6 +33,17 @@ class HeaderSection(Buildable):
         self.city = city
         self.profile = profile
         self.topic = topic
+        self._city_text = ft.Text(
+            city,
+            size=20,
+            weight=ft.FontWeight.BOLD,
+            color=ft.Colors.WHITE,
+        )
+        self._profile_text = ft.Text(
+            profile,
+            size=12,
+            color=ft.Colors.with_opacity(0.7, ft.Colors.WHITE),
+        )
         self._status = ft.Text(
             f"Connexion au topic « {topic} »…",
             size=11,
@@ -69,17 +80,8 @@ class HeaderSection(Buildable):
                                     ),
                                     ft.Column(
                                         [
-                                            ft.Text(
-                                                self.city,
-                                                size=20,
-                                                weight=ft.FontWeight.BOLD,
-                                                color=ft.Colors.WHITE,
-                                            ),
-                                            ft.Text(
-                                                self.profile,
-                                                size=12,
-                                                color=ft.Colors.with_opacity(0.7, ft.Colors.WHITE),
-                                            ),
+                                            self._city_text,
+                                            self._profile_text,
                                         ],
                                         spacing=1,
                                     ),
@@ -129,3 +131,24 @@ class HeaderSection(Buildable):
             None
         """
         self._status.value = text
+
+    def update_info(self, city: str, profile: str, topic: str) -> None:
+        """Met à jour la ville, le profil et le topic affichés dans le header.
+
+        Modifie les contrôles texte en place. L'appelant doit appeler
+        ``page.update()`` pour que les changements soient visibles.
+
+        Args:
+            city (str): Nouveau nom de ville.
+            profile (str): Nouveau profil utilisateur.
+            topic (str): Nouveau topic Kafka pour la ligne de statut.
+
+        Returns:
+            None
+        """
+        self.city = city
+        self.profile = profile
+        self.topic = topic
+        self._city_text.value = city
+        self._profile_text.value = profile
+        self._status.value = f"Connexion au topic « {topic} »…"
