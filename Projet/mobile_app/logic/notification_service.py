@@ -15,6 +15,10 @@ de la plateforme ni de la disponibilité de ``plyer``.
 
 from __future__ import annotations
 
+import json
+import os
+from pathlib import Path
+
 import flet as ft
 
 try:  # ``plyer`` n'est présent que sur l'appareil / le paquet mobile.
@@ -38,14 +42,24 @@ class NotificationService:
         """Mémorise la page et recharge la préférence persistée.
 
         Args:
-            page (ft.Page): Page Flet, utilisée pour ``client_storage`` (préférence
-                persistante) et pour la SnackBar de repli.
+            page (ft.Page): Page Flet, utilisée pour la SnackBar de repli.
             enabled_default (bool): Valeur par défaut si aucune préférence n'a
                 encore été enregistrée. ``False`` : l'utilisateur doit activer
                 explicitement les notifications depuis l'onglet Alertes.
         """
         self.page = page
         self._enabled = self._load(enabled_default)
+
+    @staticmethod
+    def _pref_file() -> Path:
+        """Chemin du fichier de préférence dans le dossier de données de l'app.
+
+        ``flet run`` exporte ``FLET_APP_STORAGE_DATA`` vers un répertoire
+        inscriptible (y compris sur Android). En son absence (tests, exécution
+        directe), on retombe sur le dossier personnel de l'utilisateur.
+        """
+        base = os.getenv("FLET_APP_STORAGE_DATA") or os.path.expanduser("~")
+        return Path(base) / "meteo_agri_prefs.json"
 
     # ----- préférence persistante -----
 
@@ -62,15 +76,18 @@ class NotificationService:
         """
         self._enabled = bool(value)
         try:
-            self.page.client_storage.set(self.STORAGE_KEY, self._enabled)
+            self._pref_file().write_text(
+                json.dumps({self.STORAGE_KEY: self._enabled})
+            )
         except Exception:
-            # L'absence de stockage client (certains contextes web/test) ne doit
-            # jamais empêcher l'activation pour la session courante.
+            # L'absence de stockage inscriptible (certains contextes web/test) ne
+            # doit jamais empêcher l'activation pour la session courante.
             pass
 
     def _load(self, default: bool) -> bool:
         try:
-            stored = self.page.client_storage.get(self.STORAGE_KEY)
+            data = json.loads(self._pref_file().read_text())
+            stored = data.get(self.STORAGE_KEY)
         except Exception:
             stored = None
         return default if stored is None else bool(stored)
@@ -113,7 +130,8 @@ class NotificationService:
         try:
             import theme
 
-            self.page.open(ft.SnackBar(ft.Text(message), bgcolor=theme.RED))
+            snack = ft.SnackBar(ft.Text(message), bgcolor=theme.RED, open=True)
+            self.page.overlay.append(snack)
             self.page.update()
         except Exception:
             pass

@@ -75,8 +75,8 @@ class CurrentWeatherSection(WeatherSection):
                                 height=56,
                                 border_radius=14,
                                 bgcolor="#FFF8E1",
-                                border=ft.border.all(1, "#FFE082"),
-                                alignment=ft.alignment.center,
+                                border=ft.Border.all(1, "#FFE082"),
+                                alignment=ft.Alignment.CENTER,
                             ),
                             ft.Column(
                                 [
@@ -153,9 +153,9 @@ class CurrentWeatherSection(WeatherSection):
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 ),
                 bgcolor=theme.BG,
-                padding=ft.padding.symmetric(vertical=8, horizontal=4),
+                padding=ft.Padding.symmetric(vertical=8, horizontal=4),
                 border_radius=10,
-                border=ft.border.all(1, theme.BORDER),
+                border=ft.Border.all(1, theme.BORDER),
                 expand=True,
             )
             cell.data = {"label": label, "icon": ico, "hi": hi}
@@ -182,7 +182,7 @@ class CurrentWeatherSection(WeatherSection):
         self._desc.value = f"{w.description.capitalize()} · {self._pretty_ts(w.timestamp)}"
 
         icon, token = WeatherIcons.for_condition(w.condition)
-        self._icon.name = UIComponents.icon_name(icon)
+        self._icon.icon = UIComponents.icon_name(icon)
         self._icon.color = UIComponents.COLOR_TOKENS[token]
 
         self._chip_hum.value = f"{w.humidity_pct}%"
@@ -204,7 +204,7 @@ class CurrentWeatherSection(WeatherSection):
         self.history.clear()
         self._temp.value = "--°C"
         self._desc.value = "En attente…"
-        self._icon.name = UIComponents.icon_name(ft.Icons.WB_SUNNY)
+        self._icon.icon = UIComponents.icon_name(ft.Icons.WB_SUNNY)
         self._icon.color = "#F59E0B"
         self._chip_hum.value = "--%"
         self._chip_wind.value = "-- m/s"
@@ -230,12 +230,12 @@ class CurrentWeatherSection(WeatherSection):
                 w = items[i]
                 d["label"].value = self._hour_or_dash(w.timestamp)
                 ico_name, token = WeatherIcons.for_condition(w.condition)
-                d["icon"].name = UIComponents.icon_name(ico_name)
+                d["icon"].icon = UIComponents.icon_name(ico_name)
                 d["icon"].color = UIComponents.COLOR_TOKENS[token]
                 d["hi"].value = f"{w.temperature_c:.0f}°"
             else:
                 d["label"].value = "—"
-                d["icon"].name = UIComponents.icon_name(ft.Icons.WB_SUNNY)
+                d["icon"].icon = UIComponents.icon_name(ft.Icons.WB_SUNNY)
                 d["icon"].color = "#F59E0B"
                 d["hi"].value = "--°"
 

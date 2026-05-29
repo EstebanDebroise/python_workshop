@@ -85,7 +85,7 @@ class ThiSection(WeatherSection):
                                         ),
                                         width=90,
                                         height=90,
-                                        alignment=ft.alignment.center,
+                                        alignment=ft.Alignment.CENTER,
                                     ),
                                 ],
                                 width=90,

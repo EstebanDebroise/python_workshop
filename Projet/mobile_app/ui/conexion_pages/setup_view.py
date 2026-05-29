@@ -127,7 +127,7 @@ class SetupView(Buildable):
                                 self._profile,
                                 self._error,
                                 ft.Container(height=4),
-                                ft.ElevatedButton(
+                                ft.Button(
                                     "Démarrer",
                                     icon=ft.Icons.PLAY_ARROW,
                                     on_click=lambda e: self._submit(),

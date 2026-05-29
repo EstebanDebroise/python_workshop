@@ -95,7 +95,7 @@ class SettingsView(Buildable):
                             self._profile,
                             self._feedback,
                             ft.Container(height=4),
-                            ft.ElevatedButton(
+                            ft.Button(
                                 "Enregistrer",
                                 icon=ft.Icons.SAVE,
                                 on_click=lambda e: self._save(),

@@ -34,19 +34,23 @@ class UIComponents:
     }
 
     @staticmethod
-    def icon_name(name: str) -> str:
-        """Convertit un identifiant snake_case en attribut ``ft.Icons`` correspondant.
+    def icon_name(name: "str | ft.Icons") -> ft.Icons:
+        """Convertit un identifiant snake_case en membre ``ft.Icons`` correspondant.
 
         Permet à la couche métier de manipuler des chaînes neutres (ex. ``wb_sunny``)
-        sans importer Flet directement.
+        sans importer Flet directement. Accepte aussi un membre ``ft.Icons`` déjà
+        résolu, qui est alors renvoyé tel quel.
 
         Args:
-            name (str): Nom de l'icône en snake_case (ex. ``"wb_sunny"``, ``"home_work"``).
+            name (str | ft.Icons): Nom de l'icône en snake_case (ex. ``"wb_sunny"``,
+                ``"home_work"``) ou un membre ``ft.Icons``.
 
         Returns:
-            str: L'attribut Flet correspondant résolu via ``getattr(ft.Icons, ...)``.
+            ft.Icons: Le membre d'énumération Flet correspondant.
         """
-        return getattr(ft.Icons, name.upper())
+        if isinstance(name, str):
+            return getattr(ft.Icons, name.upper())
+        return name
 
     @staticmethod
     def section_label(text: str) -> ft.Text:
@@ -87,7 +91,7 @@ class UIComponents:
             bgcolor=theme.CARD,
             border_radius=18,
             padding=16,
-            border=ft.border.all(1, theme.BORDER),
+            border=ft.Border.all(1, theme.BORDER),
         )
 
     @staticmethod
@@ -118,8 +122,8 @@ class UIComponents:
                 spacing=8,
             ),
             bgcolor=bg,
-            border=ft.border.all(1, border_color),
-            padding=ft.padding.symmetric(horizontal=12, vertical=10),
+            border=ft.Border.all(1, border_color),
+            padding=ft.Padding.symmetric(horizontal=12, vertical=10),
             border_radius=10,
         )
 
@@ -254,5 +258,5 @@ class UIComponents:
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             ),
             expand=True,
-            alignment=ft.alignment.center,
+            alignment=ft.Alignment.CENTER,
         )

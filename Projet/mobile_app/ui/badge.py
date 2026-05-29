@@ -37,7 +37,7 @@ class Badge:
         self.control = ft.Container(
             content=self._label,
             bgcolor=bg,
-            padding=ft.padding.symmetric(horizontal=9, vertical=3),
+            padding=ft.Padding.symmetric(horizontal=9, vertical=3),
             border_radius=20,
         )
 

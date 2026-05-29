@@ -86,7 +86,7 @@ class BottomNavSection(Buildable):
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             ),
             expand=True,
-            alignment=ft.alignment.center,
+            alignment=ft.Alignment.CENTER,
             on_click=on_click,
         )
 
@@ -114,8 +114,8 @@ class BottomNavSection(Buildable):
 
         return ft.Container(
             bgcolor=theme.CARD,
-            border=ft.border.only(top=ft.border.BorderSide(1, theme.BORDER)),
-            padding=ft.padding.only(top=10, bottom=22),
+            border=ft.Border.only(top=ft.BorderSide(1, theme.BORDER)),
+            padding=ft.Padding.only(top=10, bottom=22),
             content=ft.Row(
                 [
                     self._clickable_nav_item("dashboard", on_dashboard_click),

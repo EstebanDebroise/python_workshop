@@ -158,9 +158,9 @@ class WeatherApp:
 
     @staticmethod
     def main(page: ft.Page) -> None:
-        """Point d'entrée appelé par ``ft.app`` pour chaque session utilisateur."""
+        """Point d'entrée appelé par ``ft.run`` pour chaque session utilisateur."""
         WeatherApp(page)
 
 
 if __name__ == "__main__":
-    ft.app(target=WeatherApp.main)
+    ft.run(WeatherApp.main)

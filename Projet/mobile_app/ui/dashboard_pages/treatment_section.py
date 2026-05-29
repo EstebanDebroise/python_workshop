@@ -184,7 +184,7 @@ class TreatmentSection(WeatherSection):
                 spacing=10,
             ),
             bgcolor=bg,
-            border=ft.border.all(1, border),
-            padding=ft.padding.symmetric(horizontal=11, vertical=9),
+            border=ft.Border.all(1, border),
+            padding=ft.Padding.symmetric(horizontal=11, vertical=9),
             border_radius=10,
         )

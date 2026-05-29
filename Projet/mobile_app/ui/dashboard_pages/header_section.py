@@ -66,7 +66,7 @@ class HeaderSection(Buildable):
         """
         return ft.Container(
             bgcolor=theme.GREEN,
-            padding=ft.padding.only(left=20, right=20, top=20, bottom=20),
+            padding=ft.Padding.only(left=20, right=20, top=20, bottom=20),
             content=ft.Column(
                 [
                     ft.Row(
@@ -94,7 +94,7 @@ class HeaderSection(Buildable):
                                 height=36,
                                 border_radius=18,
                                 bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.WHITE),
-                                alignment=ft.alignment.center,
+                                alignment=ft.Alignment.CENTER,
                             ),
                         ],
                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
