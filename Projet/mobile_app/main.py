@@ -2,25 +2,30 @@
 
 Orchestre :
   - la vue de configuration (ville + profil),
-  - le consumer Kafka (thread d'arrière-plan),
+  - le client de l'API (polling périodique en arrière-plan),
   - la vue dashboard (4 sections).
+
+L'application n'accède plus directement à Kafka : elle interroge l'API
+intermédiaire (dossier ``api/``) qui lit Kafka et gère la base des lieux.
 """
 
 from __future__ import annotations
 
 import os
 import re
+import threading
 
 import flet as ft
+import requests
 
 import theme
 from logic.weather_notifier import WeatherNotifier
-from kafka_client import WeatherConsumer
+from api_client import ApiWeatherClient
 from models import Weather
 from ui.dashboard_pages.dashboard_view import DashboardView
 from ui.conexion_pages.setup_view import SetupResult, SetupView
 
-KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP", "localhost:9092")
+API_BASE = os.getenv("WEATHER_API_BASE", "http://localhost:8000")
 
 
 class WeatherApp:
@@ -36,7 +41,7 @@ class WeatherApp:
         self.page = page
         self.prev_weather: Weather | None = None
         self.dashboard: DashboardView | None = None
-        self.consumer: WeatherConsumer | None = None
+        self.client: ApiWeatherClient | None = None
         self._configure_page()
         self._show_setup()
 
@@ -56,10 +61,11 @@ class WeatherApp:
         self.page.update()
 
     def _on_setup_submitted(self, result: SetupResult) -> None:
-        """Callback de :class:`SetupView` : normalise le topic puis bascule sur le dashboard."""
+        """Callback de :class:`SetupView` : enregistre le lieu puis bascule sur le dashboard."""
         topic = re.sub(r"[^A-Za-z0-9_.\-]", "_", result.city.lower())
+        self._register_location(result.city)
         self._show_dashboard(result.city, result.profile, topic)
-        self._start_consumer(topic)
+        self._start_client(topic)
 
     def _show_dashboard(self, city: str, profile: str, topic: str) -> None:
         """Instancie le dashboard, remplace les contrôles et active le scroll."""
@@ -72,27 +78,46 @@ class WeatherApp:
         self.page.update()
 
     def _on_settings_save(self, city: str, profile: str) -> None:
-        """Applique les nouveaux réglages : met à jour le header et relance le consumer."""
+        """Applique les nouveaux réglages : enregistre le lieu, met à jour le header, relance le client."""
         topic = re.sub(r"[^A-Za-z0-9_.\-]", "_", city.lower())
-        if self.consumer is not None:
-            self.consumer.stop()
+        self._register_location(city)
         if self.dashboard is not None:
             self.dashboard.header.update_info(city, profile, topic)
             self.page.update()
         self.prev_weather = None
-        self._start_consumer(topic)
+        self._start_client(topic)
 
-    def _start_consumer(self, topic: str) -> None:
-        """Crée et lance le :class:`WeatherConsumer` lié au topic demandé."""
-        self.consumer = WeatherConsumer(
+    def _start_client(self, topic: str) -> None:
+        """Arrête l'éventuel client en cours et lance un client API sur le topic demandé."""
+        if self.client is not None:
+            self.client.stop()
+        self.client = ApiWeatherClient(
             topic=topic,
-            bootstrap=KAFKA_BOOTSTRAP,
+            api_base=API_BASE,
             on_weather=self._on_new_weather,
             on_status=self._on_status,
         )
-        self.consumer.start()
+        self.client.start()
 
-    # ----- callbacks Kafka (exécutés dans le thread consumer) -----
+    def _register_location(self, city: str) -> None:
+        """Demande à l'API d'enregistrer le lieu (ajout idempotent), sans bloquer l'UI.
+
+        L'appel HTTP est lancé dans un thread daemon et toute erreur est ignorée :
+        l'enregistrement du lieu ne doit jamais empêcher l'utilisateur d'accéder
+        au dashboard si l'API est momentanément indisponible.
+        """
+
+        def _post() -> None:
+            try:
+                requests.post(
+                    f"{API_BASE}/locations", json={"name": city}, timeout=10
+                )
+            except requests.RequestException:
+                pass
+
+        threading.Thread(target=_post, daemon=True).start()
+
+    # ----- callbacks (exécutés dans le thread du client API) -----
 
     def _on_status(self, text: str) -> None:
         """Relaie un message de statut Kafka au header du dashboard."""
