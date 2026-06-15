@@ -47,8 +47,11 @@ class LocationDB:
 
     def _init_schema(self) -> None:
         """Crée la table ``locations`` si elle n'existe pas déjà."""
-        with self._connect() as conn:
+        conn = self._connect()
+        try:
             conn.executescript(_SCHEMA)
+        finally:
+            conn.close()
 
     def add_if_absent(
         self, name: str, topic: str, country: str | None = None
@@ -65,7 +68,8 @@ class LocationDB:
                 ``True`` si une nouvelle ligne a été insérée, ``False`` si le lieu
                 existait déjà. ``location`` est l'enregistrement résultant.
         """
-        with self._connect() as conn:
+        conn = self._connect()
+        try:
             existing = conn.execute(
                 "SELECT * FROM locations WHERE topic = ?", (topic,)
             ).fetchone()
@@ -86,6 +90,8 @@ class LocationDB:
                 "SELECT * FROM locations WHERE id = ?", (cursor.lastrowid,)
             ).fetchone()
             return True, self._row_to_out(row)
+        finally:
+            conn.close()
 
     def all(self) -> list[LocationOut]:
         """Retourne tous les lieux enregistrés, triés par date de création.
@@ -93,11 +99,14 @@ class LocationDB:
         Returns:
             list[LocationOut]: La liste complète des lieux.
         """
-        with self._connect() as conn:
+        conn = self._connect()
+        try:
             rows = conn.execute(
                 "SELECT * FROM locations ORDER BY created_at ASC"
             ).fetchall()
             return [self._row_to_out(r) for r in rows]
+        finally:
+            conn.close()
 
     @staticmethod
     def _row_to_out(row: sqlite3.Row) -> LocationOut:
