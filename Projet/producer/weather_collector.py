@@ -7,6 +7,7 @@ Usage: python weather_collector.py <lat> <lon>
 import argparse
 import json
 import os
+import sqlite3
 import sys
 from datetime import datetime, timezone
 
@@ -15,12 +16,37 @@ from dotenv import load_dotenv
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
 
+from retrive_lat_lon import get_city_coordinates
+
 load_dotenv()
 
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 KAFKA_BROKER = os.getenv("KAFKA_BROKER", "localhost:9092")
-KAFKA_TOPIC = os.getenv("KAFKA_TOPIC", "weather_data")
+DATABASE_URL = os.getenv("DATABASE_URL")
 OPENWEATHER_URL = "https://api.openweathermap.org/data/2.5/weather"
+
+def fetch_kafka_topics() -> list:
+    """Récupère la liste des villes demandé à l'aide de la bdd"""
+    if not DATABASE_URL:
+        print("[ERREUR] Variable d'environnement DATABASE_URL manquante.", file=sys.stderr)
+        return []
+
+    db_path = DATABASE_URL
+    if db_path.startswith("sqlite:///"):
+        db_path = db_path[10:]
+
+    try:
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute("SELECT topic FROM locations")
+        rows = cursor.fetchall()
+        topics = [row["topic"] for row in rows]
+        conn.close()
+        return topics
+    except sqlite3.Error as e:
+        print(f"[ERREUR] Base de données : {e}", file=sys.stderr)
+        return []
 
 
 def fetch_weather(lat: float, lon: float) -> dict:
@@ -66,7 +92,7 @@ def format_message(raw: dict, lat: float, lon: float) -> dict:
     }
 
 
-def send_to_kafka(message: dict) -> None:
+def send_to_kafka(topic: str, message: dict) -> None:
     producer = KafkaProducer(
         bootstrap_servers=KAFKA_BROKER,
         value_serializer=lambda v: json.dumps(v).encode("utf-8"),
@@ -75,7 +101,7 @@ def send_to_kafka(message: dict) -> None:
 
     key = f"{message['coordinates']['lat']},{message['coordinates']['lon']}"
 
-    future = producer.send(KAFKA_TOPIC, key=key, value=message)
+    future = producer.send(topic, key=key, value=message)
     producer.flush(timeout=10)
 
     record_metadata = future.get(timeout=10)
@@ -147,11 +173,12 @@ def main():
     print(f"[INFO] Données formatées : {json.dumps(message, indent=2, ensure_ascii=False)}")
 
     try:
-        send_to_kafka(message)
+        send_to_kafka("weather_data", message)
     except KafkaError as e:
         print(f"[ERREUR] Kafka : {e}", file=sys.stderr)
         sys.exit(1)
 
 
 if __name__ == "__main__":
-    main()
+    #main()
+    pass
