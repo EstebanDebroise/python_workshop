@@ -41,10 +41,7 @@ services:
     environment:
       - KAFKA_BOOTSTRAP=broker:29092
     volumes:
-      - api-data:/data
+      - ./api/locations.db:/data/locations.db
     depends_on:
       - broker
-
-volumes:
-  api-data:
 

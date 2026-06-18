@@ -1,6 +1,5 @@
 import json
 import os
-import sqlite3
 import sys
 from datetime import datetime, timezone
 
@@ -13,33 +12,27 @@ load_dotenv()
 
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 KAFKA_BROKER = os.getenv("KAFKA_BROKER", "localhost:9092")
-DATABASE_URL = os.getenv("DATABASE_URL")
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 OPENWEATHER_URL = "https://api.openweathermap.org/data/2.5/weather"
 
 def fetch_kafka_topics() -> list:
-    """Get the list of Kafka topics from the SQLite database.
+    """Get the list of Kafka topics from the API.
+
+    Interroge l'endpoint ``GET /locations`` de l'API au lieu d'accéder
+    directement à la base de données.
+
     Returns:
-        list: A list of Kafka topics.
+        list: A list of Kafka topic names.
     """
-    if not DATABASE_URL:
-        print("[ERREUR] Variable d'environnement DATABASE_URL manquante.", file=sys.stderr)
-        return []
-
-    db_path = DATABASE_URL
-    if db_path.startswith("sqlite:///"):
-        db_path = db_path[10:]
-
     try:
-        conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        cursor.execute("SELECT topic FROM locations")
-        rows = cursor.fetchall()
-        topics = [row["topic"] for row in rows]
-        conn.close()
-        return topics
-    except sqlite3.Error as e:
-        print(f"[ERREUR] Base de données : {e}", file=sys.stderr)
+        response = requests.get(f"{API_URL}/locations", timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        if isinstance(data, dict):
+            return [data.get("name")] if data.get("name") else []
+        return [location.get("name") for location in data if isinstance(location, dict) and location.get("name")]
+    except requests.RequestException as e:
+        print(f"[ERREUR] Impossible de récupérer les topics depuis l'API : {e}", file=sys.stderr)
         return []
 
 
