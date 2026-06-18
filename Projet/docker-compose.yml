@@ -30,3 +30,21 @@ services:
     environment:
       - KAFKA_CLUSTERS_0_NAME=local
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=broker:29092
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    container_name: api
+    ports:
+      - 8000:8000
+    environment:
+      - KAFKA_BOOTSTRAP=broker:29092
+    volumes:
+      - api-data:/data
+    depends_on:
+      - broker
+
+volumes:
+  api-data:
+

@@ -1,0 +1,15 @@
+.git
+.gitignore
+.venv
+venv
+__pycache__
+*.pyc
+*.db
+.coverage
+htmlcov
+.pytest_cache
+api/.pytest_cache
+api/tests
+mobile_app
+producer
+.env
