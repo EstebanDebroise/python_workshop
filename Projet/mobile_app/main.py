@@ -11,6 +11,7 @@ intermédiaire (dossier ``api/``) qui lit Kafka et gère la base des lieux.
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import threading
@@ -26,7 +27,33 @@ from models import Weather
 from ui.dashboard_pages.dashboard_view import DashboardView
 from ui.conexion_pages.setup_view import SetupResult, SetupView
 
-API_BASE = os.getenv("WEATHER_API_BASE", "http://localhost:8000")
+def _load_api_base() -> str:
+    """Détermine l'URL de l'API sans la coder en dur dans le source.
+
+    Ordre de priorité :
+      1. variable d'environnement ``WEATHER_API_BASE`` (pratique en dev sur PC) ;
+      2. clé ``api_base`` du fichier ``config.json`` situé à côté de ce script
+         (embarqué dans l'APK au moment du build, ignoré par git) ;
+      3. ``http://localhost:8000`` en dernier recours.
+
+    Le fichier ``config.json`` est volontairement hors du dépôt : copier
+    ``config.example.json`` et y renseigner l'adresse réelle de l'API.
+    """
+    env = os.getenv("WEATHER_API_BASE")
+    if env:
+        return env
+    config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+    try:
+        with open(config_path, encoding="utf-8") as fh:
+            value = json.load(fh).get("api_base")
+            if value:
+                return value
+    except (OSError, ValueError):
+        pass
+    return "http://localhost:8000"
+
+
+API_BASE = _load_api_base()
 
 
 class WeatherApp:

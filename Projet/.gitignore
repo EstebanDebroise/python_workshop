@@ -1,4 +1,5 @@
 .env
+mobile_app/config.json
 __pycache__/
 *.pyc
 .venv/
