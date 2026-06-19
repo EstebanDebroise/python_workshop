@@ -1,5 +1,3 @@
-"""Fixtures et configuration partagées pour les tests."""
-
 import tempfile
 from pathlib import Path
 
@@ -14,7 +12,7 @@ def create_location_out(
     country: str | None = "France",
     created_at: str = "2024-01-01T00:00:00+00:00"
 ) -> LocationOut:
-    """Crée une instance LocationOut pour les tests."""
+    """Create a LocationOut object for testing purposes."""
     return LocationOut(
         id=id,
         name=name,

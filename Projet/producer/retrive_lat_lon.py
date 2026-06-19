@@ -20,12 +20,3 @@ def get_city_coordinates(city_name):
     except Exception as e:
         print(f"Error retrieving coordinates for {city_name}: {e}")
         return None
-
-
-if __name__ == "__main__":
-    city = "Montpinchon"
-    coords = get_city_coordinates(city)
-    if coords:
-        print(f"Coordinates of {city}: Latitude {coords[0]}, Longitude {coords[1]}")
-    else:
-        print(f"City '{city}' not found")

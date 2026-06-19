@@ -1,4 +1,3 @@
-import time
 import sys
 from weather_collector import fetch_kafka_topics, fetch_weather, send_to_kafka, format_message
 from retrive_lat_lon import get_city_coordinates

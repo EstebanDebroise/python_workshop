@@ -1,1 +1,1 @@
-"""Suite de tests pour l'API."""
+"""Test for the API package."""

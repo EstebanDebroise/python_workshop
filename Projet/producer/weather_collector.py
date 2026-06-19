@@ -11,9 +11,9 @@ from kafka.errors import KafkaError
 load_dotenv()
 
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
-KAFKA_BROKER = os.getenv("KAFKA_BROKER", "localhost:9092")
-API_URL = os.getenv("API_URL", "http://localhost:8000")
-OPENWEATHER_URL = "https://api.openweathermap.org/data/2.5/weather"
+KAFKA_BROKER = os.getenv("KAFKA_BROKER")
+API_URL = os.getenv("API_URL")
+OPENWEATHER_URL = os.getenv("OPENWEATHER_URL")
 
 def fetch_kafka_topics() -> list:
     """Get the list of Kafka topics from the API.

@@ -1,5 +1,3 @@
-"""Base de données SQLite des lieux suivis par les utilisateurs."""
-
 from __future__ import annotations
 
 import sqlite3
@@ -19,19 +17,18 @@ CREATE TABLE IF NOT EXISTS locations (
 
 
 class LocationDB:
-    """Dépôt SQLite pour la table des lieux.
+    """
+    SQLite repository for the locations table.
 
-    Encapsule toute la persistance des lieux. Chaque opération ouvre sa propre
-    connexion afin d'être sûre vis-à-vis des threads (FastAPI exécute les routes
-    synchrones dans un pool de threads). L'unicité est garantie par une contrainte
-    ``UNIQUE`` sur le ``topic``, ce qui permet un ajout idempotent.
+    Encapsulates all persistence for locations. Each operation opens its own connection to be thread-safe. Uniqueness is enforced by a ``UNIQUE`` constraint on the ``topic``,
+    which makes insertions idempotent.
     """
 
     def __init__(self, path: str) -> None:
-        """Mémorise le chemin du fichier et crée la table si nécessaire.
+        """Store the database file path and create the table if needed.
 
         Args:
-            path (str): Chemin du fichier SQLite (créé s'il n'existe pas).
+            path (str): Path to the SQLite file (created if it does not exist).
 
         Returns:
             None
@@ -40,13 +37,13 @@ class LocationDB:
         self._init_schema()
 
     def _connect(self) -> sqlite3.Connection:
-        """Ouvre une connexion SQLite avec accès aux colonnes par nom."""
+        """Opens a SQLite connection with column access by name."""
         conn = sqlite3.connect(self._path)
         conn.row_factory = sqlite3.Row
         return conn
 
     def _init_schema(self) -> None:
-        """Crée la table ``locations`` si elle n'existe pas déjà."""
+        """Creates the ``locations`` table if it does not already exist."""
         conn = self._connect()
         try:
             conn.executescript(_SCHEMA)
@@ -56,17 +53,17 @@ class LocationDB:
     def add_if_absent(
         self, name: str, topic: str, country: str | None = None
     ) -> tuple[bool, LocationOut]:
-        """Insère un lieu s'il n'existe pas déjà (identifié par son topic).
+        """Inserts a location if it does not already exist (identified by its topic).
 
         Args:
-            name (str): Nom du lieu.
-            topic (str): Topic normalisé servant de clé d'unicité.
-            country (str | None): Pays optionnel.
+            name (str): Name of the location.
+            topic (str): Normalized topic serving as uniqueness key.
+            country (str | None): Optional country.
 
         Returns:
-            tuple[bool, LocationOut]: ``(created, location)`` où ``created`` vaut
-                ``True`` si une nouvelle ligne a été insérée, ``False`` si le lieu
-                existait déjà. ``location`` est l'enregistrement résultant.
+            tuple[bool, LocationOut]: ``(created, location)`` where ``created`` is
+                ``True`` if a new row was inserted, ``False`` if the location
+                already existed. ``location`` is the resulting record.
         """
         conn = self._connect()
         try:
@@ -94,10 +91,10 @@ class LocationDB:
             conn.close()
 
     def all(self) -> list[LocationOut]:
-        """Retourne tous les lieux enregistrés, triés par date de création.
+        """Returns all registered locations, sorted by creation date.
 
         Returns:
-            list[LocationOut]: La liste complète des lieux.
+            list[LocationOut]: The complete list of locations.
         """
         conn = self._connect()
         try:
@@ -110,7 +107,7 @@ class LocationDB:
 
     @staticmethod
     def _row_to_out(row: sqlite3.Row) -> LocationOut:
-        """Convertit une ligne SQLite en :class:`LocationOut`."""
+        """Converts a SQLite row to :class:`LocationOut`."""
         return LocationOut(
             id=row["id"],
             name=row["name"],
