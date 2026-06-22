@@ -44,6 +44,8 @@ services:
       - 8000:8000
     env_file:
       - api/.env
+    environment:
+      - KAFKA_BROKER=broker:29092
     volumes:
       - ./api/locations.db:/data/locations.db
     depends_on:
