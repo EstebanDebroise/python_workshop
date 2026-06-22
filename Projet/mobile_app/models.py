@@ -1,4 +1,4 @@
-"""Modèle de données météo issu des messages Kafka."""
+"""Weather data model from Kafka messages."""
 
 from __future__ import annotations
 
@@ -8,10 +8,10 @@ from typing import Optional
 
 @dataclass(frozen=True)
 class Weather:
-    """Représente une mesure météo instantanée publiée sur Kafka.
+    """Represents an instantaneous weather measurement published on Kafka.
 
-    Immuable (``frozen=True``) afin de pouvoir être stockée sans risque
-    dans une file d'historique et partagée entre threads.
+    Immutable (``frozen=True``) so it can be safely stored
+    in a history queue and shared between threads.
     """
 
     location: str
@@ -32,11 +32,11 @@ class Weather:
 
     @classmethod
     def from_message(cls, m: dict) -> "Weather":
-        """Construit une instance à partir du payload JSON Kafka brut.
+        """Constructs an instance from raw Kafka JSON payload.
 
-        Les champs manquants ou ``null`` sont remplacés par des valeurs
-        neutres (0 pour les numériques, chaîne vide pour les textes)
-        pour éviter de propager des erreurs jusqu'à l'interface.
+        Missing or ``null`` fields are replaced with neutral values
+        (0 for numerics, empty string for text) to prevent errors
+        from propagating to the UI.
         """
         w = m.get("weather", {})
         return cls(

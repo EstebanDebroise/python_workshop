@@ -1,4 +1,4 @@
-"""Palette de couleurs et constantes visuelles partagées."""
+"""Color palette and shared visual constants."""
 
 GREEN = "#2D6A4F"
 GREEN_LIGHT = "#52B788"

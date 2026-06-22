@@ -1,12 +1,3 @@
-"""Client HTTP interrogeant l'API Météo Agri (intermédiaire vers Kafka).
-
-Remplace l'accès direct à Kafka : au lieu de consommer un flux, l'application
-interroge périodiquement l'API REST. L'interface (callbacks ``on_weather`` /
-``on_status``, méthodes :meth:`start` / :meth:`stop`) est volontairement
-identique à celle de l'ancien ``WeatherConsumer`` pour que l'orchestrateur n'ait
-quasiment pas à changer.
-"""
-
 from __future__ import annotations
 
 import threading
@@ -18,11 +9,11 @@ from models import Weather
 
 
 class ApiWeatherClient:
-    """Interroge périodiquement l'API pour récupérer la dernière mesure d'un topic.
+    """Periodically queries the API to retrieve the latest measurement of a topic.
 
-    Tourne dans un thread daemon dédié et relaie chaque nouvelle mesure via
-    ``on_weather`` et les changements d'état via ``on_status``. La classe ne
-    dépend ni de Flet ni de Kafka : elle ne connaît que l'API HTTP.
+    Runs in a dedicated daemon thread and relays each new measurement via
+    ``on_weather`` and state changes via ``on_status``. The class does not
+    depend on Flet or Kafka: it only knows about HTTP API.
     """
 
     def __init__(
@@ -34,17 +25,17 @@ class ApiWeatherClient:
         interval_s: float = 10.0,
         timeout_s: float = 10.0,
     ) -> None:
-        """Mémorise les paramètres ; le polling démarre à :meth:`start`.
+        """Stores parameters; polling starts at :meth:`start`.
 
         Args:
-            topic (str): Topic à interroger (ville normalisée).
-            api_base (str): URL de base de l'API (ex. ``"http://localhost:8000"``).
-            on_weather (Callable[[Weather], None]): Appelé pour chaque mesure
-                nouvelle (offset différent du précédent).
-            on_status (Callable[[str], None]): Appelé pour informer l'UI de l'état
-                (connexion, attente de données, erreur).
-            interval_s (float): Intervalle entre deux interrogations, en secondes.
-            timeout_s (float): Délai maximal d'une requête HTTP, en secondes.
+            topic (str): Topic to query (normalized city name).
+            api_base (str): Base URL of the API (ex. ``"http://localhost:8000"``).
+            on_weather (Callable[[Weather], None]): Called for each new measurement
+                (offset different from previous).
+            on_status (Callable[[str], None]): Called to inform the UI of state
+                (connection, waiting for data, error).
+            interval_s (float): Interval between two queries, in seconds.
+            timeout_s (float): Maximum delay for an HTTP request, in seconds.
 
         Returns:
             None
@@ -60,24 +51,20 @@ class ApiWeatherClient:
         self._last_offset: Optional[int] = None
 
     def start(self) -> None:
-        """Démarre le thread daemon qui interroge l'API en boucle."""
         self._thread = threading.Thread(target=self._run, daemon=True)
         self._thread.start()
 
     def stop(self) -> None:
-        """Demande l'arrêt de la boucle de polling."""
         self._stop.set()
 
     def _run(self) -> None:
-        """Boucle de polling : interroge l'API puis attend l'intervalle."""
-        self.on_status(f"Connexion à l'API pour « {self.topic} »…")
+        self.on_status(f"Connecting to API for « {self.topic} »…")
         while not self._stop.is_set():
             self._poll_once()
-            # ``wait`` permet un arrêt réactif sans attendre la fin de l'intervalle.
+            # ``wait`` allows reactive shutdown without waiting for the interval to complete.
             self._stop.wait(self.interval_s)
 
     def _poll_once(self) -> None:
-        """Effectue une interrogation et relaie le résultat via les callbacks."""
         try:
             resp = requests.get(
                 f"{self.api_base}/weather/{self.topic}", timeout=self.timeout_s
@@ -85,7 +72,7 @@ class ApiWeatherClient:
             resp.raise_for_status()
             data = resp.json()
         except requests.RequestException as exc:
-            self.on_status(f"API injoignable : {exc}")
+            self.on_status(f"API unreachable: {exc}")
             return
 
         status = data.get("status")
@@ -97,8 +84,8 @@ class ApiWeatherClient:
                     self.on_weather(Weather.from_message(data["message"]))
                 except Exception:
                     pass
-            self.on_status(f"Flux actif via API · offset {offset}")
+            self.on_status(f"Active stream via API · offset {offset}")
         elif status == "empty":
-            self.on_status(f"En attente de données sur « {self.topic} »…")
+            self.on_status(f"Waiting for data on « {self.topic} »…")
         else:
-            self.on_status(f"Erreur API : {data.get('detail') or 'inconnue'}")
+            self.on_status(f"API error: {data.get('detail') or 'unknown'}")

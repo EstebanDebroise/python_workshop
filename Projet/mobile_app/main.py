@@ -1,12 +1,12 @@
-"""Météo Agri — point d'entrée Flet.
+"""Weather Agri — Flet entry point.
 
-Orchestre :
-  - la vue de configuration (ville + profil),
-  - le client de l'API (polling périodique en arrière-plan),
-  - la vue dashboard (4 sections).
+Orchestrates:
+  - the configuration view (city + profile),
+  - the API client (periodic polling in background),
+  - the dashboard view (4 sections).
 
-L'application n'accède plus directement à Kafka : elle interroge l'API
-intermédiaire (dossier ``api/``) qui lit Kafka et gère la base des lieux.
+The application no longer accesses Kafka directly: it queries the
+intermediate API (``api/`` folder) which reads Kafka and manages locations.
 """
 
 from __future__ import annotations
@@ -28,16 +28,16 @@ from ui.dashboard_pages.dashboard_view import DashboardView
 from ui.conexion_pages.setup_view import SetupResult, SetupView
 
 def _load_api_base() -> str:
-    """Détermine l'URL de l'API sans la coder en dur dans le source.
+    """Determines the API URL without hardcoding it in the source.
 
-    Ordre de priorité :
-      1. variable d'environnement ``WEATHER_API_BASE`` (pratique en dev sur PC) ;
-      2. clé ``api_base`` du fichier ``config.json`` situé à côté de ce script
-         (embarqué dans l'APK au moment du build, ignoré par git) ;
-      3. ``http://localhost:8000`` en dernier recours.
+    Priority order:
+      1. ``WEATHER_API_BASE`` environment variable (convenient for PC development);
+      2. ``api_base`` key from ``config.json`` file located next to this script
+         (embedded in the APK at build time, ignored by git);
+      3. ``http://localhost:8000`` as a fallback.
 
-    Le fichier ``config.json`` est volontairement hors du dépôt : copier
-    ``config.example.json`` et y renseigner l'adresse réelle de l'API.
+    The ``config.json`` file is intentionally outside the repository: copy
+    ``config.example.json`` and provide the actual API address.
     """
     env = os.getenv("WEATHER_API_BASE")
     if env:
@@ -57,15 +57,15 @@ API_BASE = _load_api_base()
 
 
 class WeatherApp:
-    """Contrôleur principal : enchaîne setup → dashboard et pilote Kafka.
+    """Main controller: chains setup → dashboard and manages Kafka.
 
-    Conserve la dernière mesure pour comparer chaque nouvelle valeur et
-    déclencher les notifications de changement. Toute la mise en page
-    est déléguée à :class:`SetupView` puis :class:`DashboardView`.
+    Keeps the last measurement to compare with each new value and
+    trigger change notifications. All layout is delegated to
+    :class:`SetupView` then :class:`DashboardView`.
     """
 
     def __init__(self, page: ft.Page) -> None:
-        """Configure la page Flet et affiche l'écran de saisie initial."""
+        """Configures the Flet page and displays the initial input screen."""
         self.page = page
         self.prev_weather: Weather | None = None
         self.dashboard: DashboardView | None = None
@@ -75,14 +75,14 @@ class WeatherApp:
         self._show_setup()
 
     def _configure_page(self) -> None:
-        """Applique les réglages globaux de la page (titre, fond, thème)."""
+        """Applies global page settings (title, background, theme)."""
         self.page.title = "Météo Agri"
         self.page.bgcolor = theme.BG
         self.page.padding = 0
         self.page.theme_mode = ft.ThemeMode.LIGHT
 
     def _show_setup(self) -> None:
-        """Affiche l'écran de configuration et bloque le scroll global."""
+        """Displays the configuration screen and disables global scrolling."""
         self.page.scroll = None
         setup = SetupView(on_submit=self._on_setup_submitted)
         self.page.controls.clear()
@@ -90,14 +90,14 @@ class WeatherApp:
         self.page.update()
 
     def _on_setup_submitted(self, result: SetupResult) -> None:
-        """Callback de :class:`SetupView` : enregistre le lieu puis bascule sur le dashboard."""
+        """Callback from :class:`SetupView`: registers the location then switches to dashboard."""
         topic = re.sub(r"[^A-Za-z0-9_.\-]", "_", result.city.lower())
         self._register_location(result.city)
         self._show_dashboard(result.city, result.profile, topic)
         self._start_client(topic)
 
     def _show_dashboard(self, city: str, profile: str, topic: str) -> None:
-        """Instancie le dashboard, remplace les contrôles et active le scroll."""
+        """Instantiates the dashboard, replaces controls and enables scrolling."""
         self.dashboard = DashboardView(
             city,
             profile,
@@ -111,12 +111,12 @@ class WeatherApp:
         self.page.update()
 
     def _on_settings_save(self, city: str, profile: str) -> None:
-        """Applique les nouveaux réglages lors d'un changement de lieu.
+        """Applies new settings when location changes.
 
-        Enregistre le nouveau lieu auprès de l'API, met à jour le header, vide les
-        données affichées de l'ancien lieu (``reset_data``) puis relance le client
-        API sur le nouveau topic — ce qui déclenche immédiatement une requête pour
-        récupérer les bonnes données.
+        Registers the new location with the API, updates the header, clears
+        the old location's displayed data (``reset_data``) then restarts the API
+        client on the new topic — which immediately triggers a request to
+        fetch the correct data.
         """
         topic = re.sub(r"[^A-Za-z0-9_.\-]", "_", city.lower())
         self._register_location(city)
@@ -128,7 +128,7 @@ class WeatherApp:
         self._start_client(topic)
 
     def _start_client(self, topic: str) -> None:
-        """Arrête l'éventuel client en cours et lance un client API sur le topic demandé."""
+        """Stops any running client and starts a new API client for the requested topic."""
         if self.client is not None:
             self.client.stop()
         self.client = ApiWeatherClient(
@@ -140,11 +140,11 @@ class WeatherApp:
         self.client.start()
 
     def _register_location(self, city: str) -> None:
-        """Demande à l'API d'enregistrer le lieu (ajout idempotent), sans bloquer l'UI.
+        """Requests the API to register the location (idempotent add) without blocking the UI.
 
-        L'appel HTTP est lancé dans un thread daemon et toute erreur est ignorée :
-        l'enregistrement du lieu ne doit jamais empêcher l'utilisateur d'accéder
-        au dashboard si l'API est momentanément indisponible.
+        The HTTP call is made in a daemon thread and any error is ignored:
+        location registration must never prevent the user from accessing
+        the dashboard if the API is temporarily unavailable.
         """
 
         def _post() -> None:
@@ -157,23 +157,23 @@ class WeatherApp:
 
         threading.Thread(target=_post, daemon=True).start()
 
-    # ----- callbacks (exécutés dans le thread du client API) -----
+    # ----- callbacks (executed in the API client thread) -----
 
     def _on_status(self, text: str) -> None:
-        """Relaie un message de statut Kafka au header du dashboard."""
+        """Relays a Kafka status message to the dashboard header."""
         if self.dashboard is None:
             return
         self.dashboard.set_status(text)
         self.page.update()
 
     def _on_new_weather(self, w: Weather) -> None:
-        """Met à jour le dashboard et émet les notifications de changement.
+        """Updates the dashboard and emits change notifications.
 
-        Les messages d'alerte sont délégués au :class:`NotificationService`, qui
-        n'émet une notification (système Android ou SnackBar de repli) que si
-        l'utilisateur les a activées dans l'onglet Alertes. Le polling tourne dans
-        un thread daemon : les alertes sont donc évaluées en continu, quelle que
-        soit la page affichée.
+        Alert messages are delegated to :class:`NotificationService`, which
+        only emits a notification (Android system or fallback SnackBar) if
+        the user has enabled them in the Alerts tab. Polling runs in
+        a daemon thread: alerts are thus evaluated continuously, regardless of
+        which page is displayed.
         """
         if self.dashboard is None:
             return
@@ -185,7 +185,7 @@ class WeatherApp:
 
     @staticmethod
     def main(page: ft.Page) -> None:
-        """Point d'entrée appelé par ``ft.run`` pour chaque session utilisateur."""
+        """Entry point called by ``ft.run`` for each user session."""
         WeatherApp(page)
 
 
