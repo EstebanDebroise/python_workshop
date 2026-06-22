@@ -13,6 +13,6 @@ RUN adduser -D app
 
 # Setup cron job to run manager.py every 2 minutes
 # Redirect output to PID 1 stdout/stderr so docker logs can capture it
-RUN echo "*/2 * * * * cd /usr/local/app && python -u manager.py >> /proc/1/fd/1 2>> /proc/1/fd/2" | crontab -
+RUN echo "*/5 * * * * cd /usr/local/app && python -u manager.py >> /proc/1/fd/1 2>> /proc/1/fd/2" | crontab -
 
 CMD ["crond", "-f"]
