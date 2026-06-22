@@ -8,8 +8,10 @@ from typing import Callable
 import flet as ft
 
 import theme
+from i18n import t
 from ui.base import Buildable
 from ui.components import UIComponents
+from ui.language_selector import LanguageSelector
 
 
 @dataclass
@@ -39,7 +41,11 @@ class SetupView(Buildable):
     remonter les données à l'orchestrateur (:class:`WeatherApp`).
     """
 
-    def __init__(self, on_submit: Callable[[SetupResult], None]) -> None:
+    def __init__(
+        self,
+        on_submit: Callable[[SetupResult], None],
+        on_language_change: Callable[[], None] | None = None,
+    ) -> None:
         """Prépare les contrôles du formulaire sans les attacher à la page.
 
         Args:
@@ -47,28 +53,32 @@ class SetupView(Buildable):
                 validation du formulaire. Reçoit un :class:`SetupResult` contenant
                 la ville et le profil saisis. L'appelant est responsable de la
                 transition vers le dashboard.
+            on_language_change (Callable[[], None] | None): Callback appelé après
+                un changement de langue, pour que l'orchestrateur reconstruise
+                l'écran dans la nouvelle langue.
 
         Returns:
             None — :meth:`build` doit être appelé pour obtenir le contrôle Flet.
         """
         self.on_submit = on_submit
+        self._language = LanguageSelector(on_language_change or (lambda: None), compact=True)
         self._city = ft.TextField(
-            label="Ville",
-            hint_text="ex. Limoges",
+            label=t("setup_view", "city_label"),
+            hint_text=t("setup_view", "city_hint"),
             autofocus=True,
             on_submit=lambda e: self._submit(),
             border_color=theme.GREEN,
             focused_border_color=theme.GREEN,
         )
         self._profile = ft.Dropdown(
-            label="Profil",
+            label=t("setup_view", "profile_label"),
             options=[
-                ft.dropdown.Option("Éleveur laitier"),
-                ft.dropdown.Option("Éleveur viande"),
-                ft.dropdown.Option("Aviculteur"),
-                ft.dropdown.Option("Agriculteur"),
+                ft.dropdown.Option(key="dairy", text=t("common", "profile_dairy")),
+                ft.dropdown.Option(key="meat", text=t("common", "profile_meat")),
+                ft.dropdown.Option(key="poultry", text=t("common", "profile_poultry")),
+                ft.dropdown.Option(key="crops", text=t("common", "profile_crops")),
             ],
-            value="Éleveur laitier",
+            value="dairy",
             border_color=theme.GREEN,
         )
         self._error = ft.Text("", color=theme.RED, size=12)
@@ -92,7 +102,11 @@ class SetupView(Buildable):
             padding=24,
             content=ft.Column(
                 [
-                    ft.Container(height=60),
+                    ft.Row(
+                        [self._language.build()],
+                        alignment=ft.MainAxisAlignment.END,
+                    ),
+                    ft.Container(height=20),
                     ft.Row(
                         [
                             ft.Icon(ft.Icons.AGRICULTURE, color=theme.GREEN, size=36),
@@ -107,7 +121,7 @@ class SetupView(Buildable):
                         spacing=10,
                     ),
                     ft.Text(
-                        "Tableau de bord météo dédié aux agriculteurs et éleveurs",
+                        t("setup_view", "subtitle"),
                         size=13,
                         color=theme.MUTED,
                         text_align=ft.TextAlign.CENTER,
@@ -116,9 +130,9 @@ class SetupView(Buildable):
                     UIComponents.card(
                         ft.Column(
                             [
-                                ft.Text("Configuration", size=14, weight=ft.FontWeight.W_600),
+                                ft.Text(t("setup_view", "config_title"), size=14, weight=ft.FontWeight.W_600),
                                 ft.Text(
-                                    "Le topic Kafka utilisé portera le nom de la ville.",
+                                    t("setup_view", "config_note"),
                                     size=11,
                                     color=theme.MUTED,
                                 ),
@@ -128,7 +142,7 @@ class SetupView(Buildable):
                                 self._error,
                                 ft.Container(height=4),
                                 ft.Button(
-                                    "Démarrer",
+                                    t("setup_view", "start_button"),
                                     icon=ft.Icons.PLAY_ARROW,
                                     on_click=lambda e: self._submit(),
                                     bgcolor=theme.GREEN,
@@ -162,7 +176,7 @@ class SetupView(Buildable):
         """
         city = (self._city.value or "").strip()
         if not city:
-            self._error.value = "Saisissez le nom de votre ville."
+            self._error.value = t("setup_view", "empty_city_error")
             self._error.update()
             return
-        self.on_submit(SetupResult(city=city, profile=self._profile.value or "Agriculteur"))
+        self.on_submit(SetupResult(city=city, profile=self._profile.value or "crops"))

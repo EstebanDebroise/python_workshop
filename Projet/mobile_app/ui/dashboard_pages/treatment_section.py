@@ -5,6 +5,7 @@ from __future__ import annotations
 import flet as ft
 
 import theme
+from i18n import t
 from logic.treatment_analyzer import TreatmentAnalyzer
 from logic.treatment_slot import TreatmentSlot
 from models import Weather
@@ -52,7 +53,7 @@ class TreatmentSection(WeatherSection):
                     ft.Row(
                         [
                             ft.Text(
-                                "Pulvérisation & Traitement",
+                                t("treatment_section", "title"),
                                 size=13,
                                 weight=ft.FontWeight.W_600,
                             ),
@@ -66,21 +67,21 @@ class TreatmentSection(WeatherSection):
                             ft.Row(
                                 [
                                     ft.Container(width=8, height=8, bgcolor=theme.GREEN_LIGHT, border_radius=4),
-                                    ft.Text("Optimal", size=10, color=theme.MUTED),
+                                    ft.Text(t("treatment_section", "legend_optimal"), size=10, color=theme.MUTED),
                                 ],
                                 spacing=4,
                             ),
                             ft.Row(
                                 [
                                     ft.Container(width=8, height=8, bgcolor=theme.AMBER, border_radius=4),
-                                    ft.Text("Risqué", size=10, color=theme.MUTED),
+                                    ft.Text(t("treatment_section", "legend_risky"), size=10, color=theme.MUTED),
                                 ],
                                 spacing=4,
                             ),
                             ft.Row(
                                 [
                                     ft.Container(width=8, height=8, bgcolor=theme.RED, border_radius=4),
-                                    ft.Text("Déconseillé", size=10, color=theme.MUTED),
+                                    ft.Text(t("treatment_section", "legend_discouraged"), size=10, color=theme.MUTED),
                                 ],
                                 spacing=4,
                             ),
@@ -111,9 +112,9 @@ class TreatmentSection(WeatherSection):
         self._slots.controls = [self._render_slot(s) for s in slots]
         ok_count = sum(1 for s in slots if s.status == "ok")
         if ok_count:
-            self.badge.update(f"{ok_count} CRÉNEAU OK", "ok")
+            self.badge.update(t("treatment_section", "badge_ok", count=ok_count), "ok")
         else:
-            self.badge.update("AUCUN", "danger")
+            self.badge.update(t("treatment_section", "badge_none"), "danger")
 
     def reset(self) -> None:
         """Vide la liste des créneaux et remet le badge à son état d'attente.

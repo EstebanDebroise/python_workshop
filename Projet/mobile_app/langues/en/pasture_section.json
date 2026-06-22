@@ -1,0 +1,17 @@
+{
+  "title": "Feels-like & Pasture",
+  "stat_temp": "Actual temperature",
+  "stat_feels": "Feels like",
+  "stat_wind": "Wind",
+  "stat_clouds": "Clouds",
+  "wind_strong": "strong",
+  "wind_moderate": "moderate",
+  "wind_impact": "{wind} wind → feels {diff}°C",
+  "comfort_impact": "Impact on animal comfort",
+  "badge_ok": "OK",
+  "badge_warning": "CAUTION",
+  "cold_shelter": "Strong wind → feels {feels}°C. Shelter calves and lambs.",
+  "sun_shade": "Clear sky + still air → maximum sunlight. Shade required.",
+  "heat_water": "High heat: double the herd's water points.",
+  "cold_hypothermia": "Cold + wind: hypothermia risk for the young."
+}

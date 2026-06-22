@@ -1,0 +1,21 @@
+{
+  "token_sun": "Ensoleillé",
+  "token_rain": "Pluie",
+  "token_snow": "Neige",
+  "token_cloud": "Nuageux",
+  "token_storm": "Orage",
+  "Clear": "Ciel dégagé",
+  "Clouds": "Nuageux",
+  "Rain": "Pluie",
+  "Drizzle": "Bruine",
+  "Thunderstorm": "Orage",
+  "Snow": "Neige",
+  "Mist": "Brume",
+  "Fog": "Brouillard",
+  "Haze": "Brume sèche",
+  "Smoke": "Fumée",
+  "Dust": "Poussière",
+  "Sand": "Sable",
+  "Tornado": "Tornade",
+  "Squall": "Bourrasque"
+}

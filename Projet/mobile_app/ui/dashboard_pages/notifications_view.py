@@ -5,6 +5,7 @@ from __future__ import annotations
 import flet as ft
 
 import theme
+from i18n import t
 from logic.notification_service import NotificationService
 from ui.base import Buildable
 from ui.components import UIComponents
@@ -18,11 +19,11 @@ class NotificationsView(Buildable):
     l'envoi des notifications système déclenchées par la boucle de polling.
     """
 
-    #: Libellés des changements météo surveillés, affichés à titre informatif.
+    #: Icône + clé de traduction des changements météo surveillés (affichés à titre informatif).
     MONITORED = [
-        (ft.Icons.THERMOSTAT, "Stress thermique (THI en zone danger)"),
-        (ft.Icons.WATER_DROP, "Apparition de pluie (pulvérisation à reporter)"),
-        (ft.Icons.CLOUD, "Changement de condition (ensoleillé → couvert…)"),
+        (ft.Icons.THERMOSTAT, "monitored_thi"),
+        (ft.Icons.WATER_DROP, "monitored_rain"),
+        (ft.Icons.CLOUD, "monitored_condition"),
     ]
 
     def __init__(self, service: NotificationService) -> None:
@@ -45,11 +46,7 @@ class NotificationsView(Buildable):
         )
 
     def _status_text(self, enabled: bool) -> str:
-        return (
-            "Notifications activées — vous serez prévenu sur cet appareil."
-            if enabled
-            else "Notifications désactivées."
-        )
+        return t("notifications_view", "enabled_status" if enabled else "disabled_status")
 
     def _on_toggle(self, e: ft.ControlEvent) -> None:
         """Persiste le nouvel état et met à jour le texte de statut."""
@@ -64,11 +61,11 @@ class NotificationsView(Buildable):
             ft.Row(
                 [
                     ft.Icon(icon, color=theme.GREEN, size=16),
-                    ft.Text(label, size=12, color=theme.TEXT, expand=True),
+                    ft.Text(t("notifications_view", key), size=12, color=theme.TEXT, expand=True),
                 ],
                 spacing=8,
             )
-            for icon, label in self.MONITORED
+            for icon, key in self.MONITORED
         ]
 
     def build(self) -> ft.Control:
@@ -91,7 +88,7 @@ class NotificationsView(Buildable):
                                         size=18,
                                     ),
                                     ft.Text(
-                                        "Notifications",
+                                        t("notifications_view", "title"),
                                         size=13,
                                         weight=ft.FontWeight.W_600,
                                         color=theme.TEXT,
@@ -113,7 +110,7 @@ class NotificationsView(Buildable):
             ft.Column(
                 [
                     ft.Text(
-                        "Changements surveillés",
+                        t("notifications_view", "monitored_title"),
                         size=13,
                         weight=ft.FontWeight.W_600,
                         color=theme.TEXT,
@@ -121,9 +118,7 @@ class NotificationsView(Buildable):
                     *self._monitored_rows(),
                     ft.Container(height=2),
                     ft.Text(
-                        "Une fois activées, l'application continue d'interroger "
-                        "la météo et vous envoie une notification dès qu'une "
-                        "alerte est détectée.",
+                        t("notifications_view", "info_text"),
                         size=11,
                         color=theme.MUTED,
                     ),
@@ -134,7 +129,7 @@ class NotificationsView(Buildable):
 
         return ft.Column(
             [
-                UIComponents.section_label("Alertes"),
+                UIComponents.section_label(t("notifications_view", "section_label")),
                 toggle_card,
                 info_card,
             ],

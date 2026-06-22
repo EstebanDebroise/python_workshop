@@ -1,0 +1,10 @@
+{
+  "subtitle": "Panel meteorológico para agricultores y ganaderos",
+  "city_label": "Ciudad",
+  "city_hint": "p. ej. Limoges",
+  "profile_label": "Perfil",
+  "config_title": "Configuración",
+  "config_note": "El topic de Kafka utilizado llevará el nombre de la ciudad.",
+  "start_button": "Iniciar",
+  "empty_city_error": "Introduzca el nombre de su ciudad."
+}

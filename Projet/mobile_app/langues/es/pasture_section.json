@@ -1,0 +1,17 @@
+{
+  "title": "Sensación y Pastoreo",
+  "stat_temp": "Temperatura real",
+  "stat_feels": "Sensación",
+  "stat_wind": "Viento",
+  "stat_clouds": "Nubes",
+  "wind_strong": "fuerte",
+  "wind_moderate": "moderado",
+  "wind_impact": "Viento {wind} → sensación {diff}°C",
+  "comfort_impact": "Impacto en el confort animal",
+  "badge_ok": "OK",
+  "badge_warning": "VIGILANCIA",
+  "cold_shelter": "Viento fuerte → sensación {feels}°C. Resguardar terneros y corderos.",
+  "sun_shade": "Cielo despejado + aire en calma → máxima insolación. Sombra obligatoria.",
+  "heat_water": "Calor elevado: duplicar los puntos de agua del rebaño.",
+  "cold_hypothermia": "Frío + viento: riesgo de hipotermia para las crías."
+}

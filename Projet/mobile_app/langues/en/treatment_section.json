@@ -1,0 +1,8 @@
+{
+  "title": "Spraying & Treatment",
+  "legend_optimal": "Optimal",
+  "legend_risky": "Risky",
+  "legend_discouraged": "Not advised",
+  "badge_ok": "{count} SLOT OK",
+  "badge_none": "NONE"
+}

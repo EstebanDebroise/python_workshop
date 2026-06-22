@@ -1,0 +1,21 @@
+{
+  "token_sun": "Soleado",
+  "token_rain": "Lluvia",
+  "token_snow": "Nieve",
+  "token_cloud": "Nuboso",
+  "token_storm": "Tormenta",
+  "Clear": "Cielo despejado",
+  "Clouds": "Nuboso",
+  "Rain": "Lluvia",
+  "Drizzle": "Llovizna",
+  "Thunderstorm": "Tormenta",
+  "Snow": "Nieve",
+  "Mist": "Neblina",
+  "Fog": "Niebla",
+  "Haze": "Calima",
+  "Smoke": "Humo",
+  "Dust": "Polvo",
+  "Sand": "Arena",
+  "Tornado": "Tornado",
+  "Squall": "Turbonada"
+}

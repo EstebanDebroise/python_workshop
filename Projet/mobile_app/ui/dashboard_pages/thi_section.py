@@ -5,6 +5,7 @@ from __future__ import annotations
 import flet as ft
 
 import theme
+from i18n import t
 from logic.thi_calculator import ThiCalculator
 from logic.thi_result import ThiResult
 from models import Weather
@@ -42,7 +43,7 @@ class ThiSection(WeatherSection):
             stroke_width=8,
         )
         self._status = ft.Text("—", size=15, weight=ft.FontWeight.BOLD, color=theme.RED)
-        self._desc = ft.Text("En attente de données.", size=11, color=theme.MUTED)
+        self._desc = ft.Text(t("thi_section", "waiting"), size=11, color=theme.MUTED)
         self._alert_zone = ft.Container(visible=False)
 
     def build(self) -> ft.Control:
@@ -64,7 +65,7 @@ class ThiSection(WeatherSection):
                 [
                     ft.Row(
                         [
-                            ft.Text("Indice THI Bétail", size=13, weight=ft.FontWeight.W_600),
+                            ft.Text(t("thi_section", "title"), size=13, weight=ft.FontWeight.W_600),
                             self.badge.control,
                         ],
                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -108,9 +109,9 @@ class ThiSection(WeatherSection):
                                     ),
                                     ft.Row(
                                         [
-                                            ft.Text("Normal", size=9, color=theme.MUTED),
-                                            ft.Text("Alerte", size=9, color=theme.MUTED),
-                                            ft.Text("Danger", size=9, color=theme.MUTED),
+                                            ft.Text(t("thi_section", "zone_normal"), size=9, color=theme.MUTED),
+                                            ft.Text(t("thi_section", "zone_alert"), size=9, color=theme.MUTED),
+                                            ft.Text(t("thi_section", "zone_danger"), size=9, color=theme.MUTED),
                                         ],
                                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                                     ),
@@ -149,21 +150,21 @@ class ThiSection(WeatherSection):
         self._value.color = color
         self._ring.color = color
         self._ring.value = max(0.0, min(1.0, (result.value - 50) / 40))
-        self._status.value = result.label
+        self._status.value = t("thi_section", f"{result.code}_label")
         self._status.color = color
-        self._desc.value = result.description
-        self.badge.update(result.label.split()[-1].upper(), result.kind)
+        self._desc.value = t("thi_section", f"{result.code}_desc")
+        self.badge.update(t("thi_section", f"{result.code}_badge"), result.kind)
 
         if result.kind == "danger":
             self._alert_zone.content = ft.Column(
                 [
                     UIComponents.danger_alert(
                         ft.Icons.WARNING_AMBER,
-                        f"Pic de chaleur détecté · ventilation des bâtiments recommandée (THI {result.value:.0f})",
+                        t("thi_section", "danger_alert", value=f"{result.value:.0f}"),
                     ),
                     UIComponents.info_alert(
                         ft.Icons.NOTIFICATIONS_ACTIVE,
-                        "Notification envoyée aux éleveurs · seuil danger franchi",
+                        t("thi_section", "danger_info"),
                     ),
                 ],
                 spacing=6,
@@ -187,6 +188,6 @@ class ThiSection(WeatherSection):
         self._ring.color = theme.RED
         self._status.value = "—"
         self._status.color = theme.RED
-        self._desc.value = "En attente de données."
+        self._desc.value = t("thi_section", "waiting")
         self.badge.update("—", "ok")
         self._alert_zone.visible = False

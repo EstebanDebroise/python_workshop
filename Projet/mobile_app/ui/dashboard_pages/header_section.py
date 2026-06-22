@@ -5,7 +5,13 @@ from __future__ import annotations
 import flet as ft
 
 import theme
+from i18n import t
 from ui.base import Buildable
+
+
+def _profile_label(profile: str) -> str:
+    """Traduit un code de profil (ex. ``"dairy"``) en libellé affichable."""
+    return t("common", f"profile_{profile}")
 
 
 class HeaderSection(Buildable):
@@ -40,12 +46,12 @@ class HeaderSection(Buildable):
             color=ft.Colors.WHITE,
         )
         self._profile_text = ft.Text(
-            profile,
+            _profile_label(profile),
             size=12,
             color=ft.Colors.with_opacity(0.7, ft.Colors.WHITE),
         )
         self._status = ft.Text(
-            f"Connexion au topic « {topic} »…",
+            t("header_section", "connecting", topic=topic),
             size=11,
             color=ft.Colors.with_opacity(0.7, ft.Colors.WHITE),
         )
@@ -150,5 +156,5 @@ class HeaderSection(Buildable):
         self.profile = profile
         self.topic = topic
         self._city_text.value = city
-        self._profile_text.value = profile
-        self._status.value = f"Connexion au topic « {topic} »…"
+        self._profile_text.value = _profile_label(profile)
+        self._status.value = t("header_section", "connecting", topic=topic)

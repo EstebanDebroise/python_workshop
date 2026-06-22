@@ -1,0 +1,10 @@
+{
+  "subtitle": "Tableau de bord météo dédié aux agriculteurs et éleveurs",
+  "city_label": "Ville",
+  "city_hint": "ex. Limoges",
+  "profile_label": "Profil",
+  "config_title": "Configuration",
+  "config_note": "Le topic Kafka utilisé portera le nom de la ville.",
+  "start_button": "Démarrer",
+  "empty_city_error": "Saisissez le nom de votre ville."
+}

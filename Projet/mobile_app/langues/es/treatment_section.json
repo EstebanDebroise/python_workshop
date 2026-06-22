@@ -1,0 +1,8 @@
+{
+  "title": "Pulverización y Tratamiento",
+  "legend_optimal": "Óptimo",
+  "legend_risky": "Arriesgado",
+  "legend_discouraged": "No recomendado",
+  "badge_ok": "{count} FRANJA OK",
+  "badge_none": "NINGUNA"
+}

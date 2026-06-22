@@ -7,6 +7,7 @@ from typing import Iterable
 import flet as ft
 
 import theme
+from i18n import t
 from logic.pasture_alert import PastureAlert
 from logic.pasture_analyzer import PastureAnalyzer
 from models import Weather
@@ -60,22 +61,22 @@ class PastureSection(WeatherSection):
                 [
                     ft.Row(
                         [
-                            ft.Text("Ressenti & Pâturage", size=13, weight=ft.FontWeight.W_600),
+                            ft.Text(t("pasture_section", "title"), size=13, weight=ft.FontWeight.W_600),
                             self.badge.control,
                         ],
                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     ),
                     ft.Row(
                         [
-                            UIComponents.stat_cell(self._temp, "°C", "Température réelle"),
-                            UIComponents.stat_cell(self._feels, "°C", "Ressenti"),
+                            UIComponents.stat_cell(self._temp, "°C", t("pasture_section", "stat_temp")),
+                            UIComponents.stat_cell(self._feels, "°C", t("pasture_section", "stat_feels")),
                         ],
                         spacing=8,
                     ),
                     ft.Row(
                         [
-                            UIComponents.stat_cell(self._wind, "m/s", "Vent"),
-                            UIComponents.stat_cell(self._clouds, "%", "Nuages"),
+                            UIComponents.stat_cell(self._wind, "m/s", t("pasture_section", "stat_wind")),
+                            UIComponents.stat_cell(self._clouds, "%", t("pasture_section", "stat_clouds")),
                         ],
                         spacing=8,
                     ),
@@ -108,18 +109,18 @@ class PastureSection(WeatherSection):
 
         feels_diff = w.feels_like_c - w.temperature_c
         if abs(feels_diff) >= 2:
-            wind_word = "fort" if w.wind_speed_ms >= 5 else "modéré"
+            wind_word = t("pasture_section", "wind_strong" if w.wind_speed_ms >= 5 else "wind_moderate")
             self._feels_row.content = ft.Row(
                 [
                     ft.Icon(ft.Icons.AIR, color=theme.SOIL, size=18),
                     ft.Column(
                         [
                             ft.Text(
-                                f"Vent {wind_word} → ressenti {feels_diff:+.0f}°C",
+                                t("pasture_section", "wind_impact", wind=wind_word, diff=f"{feels_diff:+.0f}"),
                                 size=12,
                                 weight=ft.FontWeight.W_600,
                             ),
-                            ft.Text("Impact sur le confort animal", size=10, color=theme.MUTED),
+                            ft.Text(t("pasture_section", "comfort_impact"), size=10, color=theme.MUTED),
                         ],
                         spacing=1,
                         expand=True,
@@ -142,9 +143,9 @@ class PastureSection(WeatherSection):
 
         self._alerts.controls = list(self._render_pasture_alerts(PastureAnalyzer.alerts(w)))
         if not self._alerts.controls:
-            self.badge.update("OK", "ok")
+            self.badge.update(t("pasture_section", "badge_ok"), "ok")
         else:
-            self.badge.update("VIGILANCE", "warn")
+            self.badge.update(t("pasture_section", "badge_warning"), "warn")
 
     def reset(self) -> None:
         """Remet les 4 indicateurs, la ligne ressenti et les alertes à leur état d'attente.
@@ -179,9 +180,10 @@ class PastureSection(WeatherSection):
         """
         for a in alerts:
             icon = UIComponents.icon_name(a.icon)
+            message = t("pasture_section", a.code, **a.params)
             if a.kind == "cold":
-                yield UIComponents.cold_alert(icon, a.message)
+                yield UIComponents.cold_alert(icon, message)
             elif a.kind == "sun":
-                yield UIComponents.sun_alert(icon, a.message)
+                yield UIComponents.sun_alert(icon, message)
             else:
-                yield UIComponents.warn_alert(icon, a.message)
+                yield UIComponents.warn_alert(icon, message)

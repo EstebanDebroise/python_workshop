@@ -1,0 +1,8 @@
+{
+  "title": "Pulvérisation & Traitement",
+  "legend_optimal": "Optimal",
+  "legend_risky": "Risqué",
+  "legend_discouraged": "Déconseillé",
+  "badge_ok": "{count} CRÉNEAU OK",
+  "badge_none": "AUCUN"
+}

@@ -7,6 +7,7 @@ from typing import Callable, Optional
 import flet as ft
 
 import theme
+from i18n import t
 from logic.notification_service import NotificationService
 from models import Weather
 from ui.base import Buildable
@@ -44,6 +45,7 @@ class DashboardView(Buildable):
         topic: str,
         notification_service: NotificationService,
         on_settings_save: Optional[Callable[[str, str], None]] = None,
+        on_language_change: Optional[Callable[[], None]] = None,
     ) -> None:
         """Instancie chaque sous-section et prépare la zone de contenu permutable.
 
@@ -64,6 +66,7 @@ class DashboardView(Buildable):
         self._current_profile = profile
         self._notification_service = notification_service
         self._on_settings_save_cb = on_settings_save
+        self._on_language_change_cb = on_language_change
 
         self.header = HeaderSection(city, profile, topic)
         self.current = CurrentWeatherSection()
@@ -87,13 +90,13 @@ class DashboardView(Buildable):
     def _make_dashboard_content(self) -> ft.Column:
         return ft.Column(
             [
-                UIComponents.section_label("Météo actuelle"),
+                UIComponents.section_label(t("dashboard_view", "current_weather")),
                 self.current.build(),
-                UIComponents.section_label("Stress thermique"),
+                UIComponents.section_label(t("dashboard_view", "thermal_stress")),
                 self.thi.build(),
-                UIComponents.section_label("Confort au pré"),
+                UIComponents.section_label(t("dashboard_view", "pasture_comfort")),
                 self.pasture.build(),
-                UIComponents.section_label("Fenêtre de traitement"),
+                UIComponents.section_label(t("dashboard_view", "treatment_window")),
                 self.treatment.build(),
                 ft.Container(height=8),
             ],
@@ -110,7 +113,12 @@ class DashboardView(Buildable):
         self._body.update()
 
     def _nav_to_settings(self) -> None:
-        settings = SettingsView(self._current_city, self._current_profile, self._on_settings_saved)
+        settings = SettingsView(
+            self._current_city,
+            self._current_profile,
+            self._on_settings_saved,
+            on_language_change=self._on_language_change_cb,
+        )
         self._body.content = settings.build()
         self._body.update()
 

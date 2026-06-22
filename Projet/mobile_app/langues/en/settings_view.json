@@ -1,0 +1,11 @@
+{
+  "section_label": "Settings",
+  "city_label": "City",
+  "profile_label": "Livestock type",
+  "localisation_title": "Location",
+  "farming_type_title": "Livestock type",
+  "language_title": "Language",
+  "save_button": "Save",
+  "empty_city_error": "Enter the name of your city.",
+  "saved_confirm": "Settings saved."
+}

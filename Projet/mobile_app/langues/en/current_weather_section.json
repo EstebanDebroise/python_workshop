@@ -1,0 +1,6 @@
+{
+  "waiting": "Waiting…",
+  "feels_chip": "feels {v}°C",
+  "gust": " (gust {v})",
+  "history_title": "Recent history (last 7 readings)"
+}

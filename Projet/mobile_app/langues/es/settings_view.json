@@ -1,0 +1,11 @@
+{
+  "section_label": "Ajustes",
+  "city_label": "Ciudad",
+  "profile_label": "Tipo de ganadería",
+  "localisation_title": "Ubicación",
+  "farming_type_title": "Tipo de ganadería",
+  "language_title": "Idioma",
+  "save_button": "Guardar",
+  "empty_city_error": "Introduzca el nombre de su ciudad.",
+  "saved_confirm": "Ajustes guardados."
+}

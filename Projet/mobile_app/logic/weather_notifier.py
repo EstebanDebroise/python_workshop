@@ -4,6 +4,7 @@ from typing import Optional
 
 from models import Weather
 
+import i18n
 from logic.thi_calculator import ThiCalculator
 
 
@@ -17,11 +18,16 @@ class WeatherNotifier:
         thi_prev = ThiCalculator.compute(prev.temperature_c, prev.humidity_pct)
         thi_now = ThiCalculator.compute(curr.temperature_c, curr.humidity_pct)
         if thi_now >= 79 > thi_prev:
-            msgs.append("Stress thermique : zone danger atteinte (THI)")
+            msgs.append(i18n.t("messages", "thi_danger"))
         rain_prev = prev.rain_1h_mm or 0
         rain_now = curr.rain_1h_mm or 0
         if rain_now > 0 and rain_prev == 0:
-            msgs.append("Pluie en cours — pulvérisation à reporter")
+            msgs.append(i18n.t("messages", "rain_started"))
         if curr.condition != prev.condition:
-            msgs.append(f"Changement de temps : {prev.condition} → {curr.condition}")
+            msgs.append(i18n.t(
+                "messages",
+                "condition_change",
+                prev=i18n.t("conditions", prev.condition),
+                curr=i18n.t("conditions", curr.condition),
+            ))
         return msgs

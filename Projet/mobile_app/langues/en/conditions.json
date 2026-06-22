@@ -1,0 +1,21 @@
+{
+  "token_sun": "Sunny",
+  "token_rain": "Rain",
+  "token_snow": "Snow",
+  "token_cloud": "Cloudy",
+  "token_storm": "Storm",
+  "Clear": "Clear sky",
+  "Clouds": "Cloudy",
+  "Rain": "Rain",
+  "Drizzle": "Drizzle",
+  "Thunderstorm": "Thunderstorm",
+  "Snow": "Snow",
+  "Mist": "Mist",
+  "Fog": "Fog",
+  "Haze": "Haze",
+  "Smoke": "Smoke",
+  "Dust": "Dust",
+  "Sand": "Sand",
+  "Tornado": "Tornado",
+  "Squall": "Squall"
+}

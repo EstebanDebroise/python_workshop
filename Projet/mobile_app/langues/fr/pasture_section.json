@@ -1,0 +1,17 @@
+{
+  "title": "Ressenti & Pâturage",
+  "stat_temp": "Température réelle",
+  "stat_feels": "Ressenti",
+  "stat_wind": "Vent",
+  "stat_clouds": "Nuages",
+  "wind_strong": "fort",
+  "wind_moderate": "modéré",
+  "wind_impact": "Vent {wind} → ressenti {diff}°C",
+  "comfort_impact": "Impact sur le confort animal",
+  "badge_ok": "OK",
+  "badge_warning": "VIGILANCE",
+  "cold_shelter": "Vent fort → ressenti {feels}°C. Abriter veaux et agneaux.",
+  "sun_shade": "Ciel dégagé + air immobile → ensoleillement maximal. Ombre obligatoire.",
+  "heat_water": "Chaleur élevée : doubler les points d'eau du troupeau.",
+  "cold_hypothermia": "Froid + vent : risque hypothermie pour les jeunes."
+}

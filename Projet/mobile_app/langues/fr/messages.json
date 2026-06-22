@@ -1,0 +1,10 @@
+{
+  "thi_danger": "Stress thermique : zone danger atteinte (THI)",
+  "rain_started": "Pluie en cours — pulvérisation à reporter",
+  "condition_change": "Changement de temps : {prev} → {curr}",
+  "status_connecting": "Connexion à l'API pour « {topic} »…",
+  "status_active": "Flux actif via l'API · offset {offset}",
+  "status_waiting": "En attente de données sur « {topic} »…",
+  "status_unreachable": "API injoignable : {error}",
+  "status_error": "Erreur API : {detail}"
+}

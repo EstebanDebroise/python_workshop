@@ -1,0 +1,10 @@
+{
+  "thi_danger": "Thermal stress: danger zone reached (THI)",
+  "rain_started": "Rain in progress — spraying to postpone",
+  "condition_change": "Weather change: {prev} → {curr}",
+  "status_connecting": "Connecting to the API for « {topic} »…",
+  "status_active": "Active stream via the API · offset {offset}",
+  "status_waiting": "Waiting for data on « {topic} »…",
+  "status_unreachable": "API unreachable: {error}",
+  "status_error": "API error: {detail}"
+}

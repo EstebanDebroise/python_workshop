@@ -1,0 +1,11 @@
+{
+  "section_label": "Réglages",
+  "city_label": "Ville",
+  "profile_label": "Type d'élevage",
+  "localisation_title": "Localisation",
+  "farming_type_title": "Type d'élevage",
+  "language_title": "Langue",
+  "save_button": "Enregistrer",
+  "empty_city_error": "Saisissez le nom de votre ville.",
+  "saved_confirm": "Réglages enregistrés."
+}

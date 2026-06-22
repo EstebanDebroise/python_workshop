@@ -1,0 +1,11 @@
+{
+  "section_label": "Alertes",
+  "title": "Notifications",
+  "monitored_title": "Changements surveillés",
+  "monitored_thi": "Stress thermique (THI en zone danger)",
+  "monitored_rain": "Apparition de pluie (pulvérisation à reporter)",
+  "monitored_condition": "Changement de condition (ensoleillé → couvert…)",
+  "enabled_status": "Notifications activées — vous serez prévenu sur cet appareil.",
+  "disabled_status": "Notifications désactivées.",
+  "info_text": "Une fois activées, l'application continue d'interroger la météo et vous envoie une notification dès qu'une alerte est détectée."
+}

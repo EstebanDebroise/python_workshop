@@ -1,0 +1,11 @@
+{
+  "section_label": "Alerts",
+  "title": "Notifications",
+  "monitored_title": "Monitored changes",
+  "monitored_thi": "Thermal stress (THI in danger zone)",
+  "monitored_rain": "Onset of rain (spraying to postpone)",
+  "monitored_condition": "Condition change (sunny → overcast…)",
+  "enabled_status": "Notifications enabled — you will be alerted on this device.",
+  "disabled_status": "Notifications disabled.",
+  "info_text": "Once enabled, the app keeps polling the weather and sends you a notification as soon as an alert is detected."
+}

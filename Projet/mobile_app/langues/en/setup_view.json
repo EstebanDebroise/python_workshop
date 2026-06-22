@@ -1,0 +1,10 @@
+{
+  "subtitle": "Weather dashboard for farmers and livestock keepers",
+  "city_label": "City",
+  "city_hint": "e.g. Limoges",
+  "profile_label": "Profile",
+  "config_title": "Configuration",
+  "config_note": "The Kafka topic used will be named after the city.",
+  "start_button": "Start",
+  "empty_city_error": "Enter the name of your city."
+}

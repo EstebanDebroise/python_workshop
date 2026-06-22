@@ -7,6 +7,7 @@ from typing import Callable
 import flet as ft
 
 import theme
+from i18n import t
 from ui.base import Buildable
 from ui.components import UIComponents
 
@@ -49,13 +50,13 @@ class BottomNavSection(Buildable):
         }
         self._texts: dict[str, ft.Text] = {
             "dashboard": ft.Text(
-                "Tableau", size=9, color=theme.GREEN, weight=ft.FontWeight.W_500
+                t("bottom_nav_section", "dashboard"), size=9, color=theme.GREEN, weight=ft.FontWeight.W_500
             ),
             "alerts": ft.Text(
-                "Alertes", size=9, color=theme.MUTED, weight=ft.FontWeight.W_400
+                t("bottom_nav_section", "alerts"), size=9, color=theme.MUTED, weight=ft.FontWeight.W_400
             ),
             "settings": ft.Text(
-                "Réglages", size=9, color=theme.MUTED, weight=ft.FontWeight.W_400
+                t("bottom_nav_section", "settings"), size=9, color=theme.MUTED, weight=ft.FontWeight.W_400
             ),
         }
 
@@ -119,7 +120,7 @@ class BottomNavSection(Buildable):
             content=ft.Row(
                 [
                     self._clickable_nav_item("dashboard", on_dashboard_click),
-                    UIComponents.nav_item(ft.Icons.SHOW_CHART, "Historique", False),
+                    UIComponents.nav_item(ft.Icons.SHOW_CHART, t("bottom_nav_section", "history"), False),
                     self._clickable_nav_item("alerts", on_alerts_click),
                     self._clickable_nav_item("settings", on_settings_click),
                 ],

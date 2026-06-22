@@ -14,25 +14,14 @@ class PastureAnalyzer:
         if feels_diff <= -3 and w.wind_speed_ms >= 5:
             alerts.append(PastureAlert(
                 "home_work",
-                f"Vent fort → ressenti {feels_diff:+.0f}°C. Abriter veaux et agneaux.",
+                "cold_shelter",
                 "cold",
+                {"feels": f"{feels_diff:+.0f}"},
             ))
         if w.temperature_c >= 25 and w.clouds_pct <= 10 and w.wind_speed_ms <= 1:
-            alerts.append(PastureAlert(
-                "wb_sunny",
-                "Ciel dégagé + air immobile → ensoleillement maximal. Ombre obligatoire.",
-                "sun",
-            ))
+            alerts.append(PastureAlert("wb_sunny", "sun_shade", "sun"))
         if w.temperature_c >= 30:
-            alerts.append(PastureAlert(
-                "local_drink",
-                "Chaleur élevée : doubler les points d'eau du troupeau.",
-                "warn",
-            ))
+            alerts.append(PastureAlert("local_drink", "heat_water", "warn"))
         if w.temperature_c <= 5 and w.wind_speed_ms >= 4:
-            alerts.append(PastureAlert(
-                "ac_unit",
-                "Froid + vent : risque hypothermie pour les jeunes.",
-                "cold",
-            ))
+            alerts.append(PastureAlert("ac_unit", "cold_hypothermia", "cold"))
         return alerts

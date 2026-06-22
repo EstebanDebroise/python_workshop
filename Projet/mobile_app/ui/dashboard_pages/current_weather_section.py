@@ -8,6 +8,7 @@ from datetime import datetime
 import flet as ft
 
 import theme
+from i18n import t, tr_list
 from logic.weather_icons import WeatherIcons
 from models import Weather
 from ui.base import WeatherSection
@@ -43,11 +44,11 @@ class CurrentWeatherSection(WeatherSection):
         """
         self.history: deque[Weather] = deque(maxlen=self.HISTORY_LEN)
         self._temp = ft.Text("--°C", size=32, weight=ft.FontWeight.BOLD, color=theme.TEXT)
-        self._desc = ft.Text("En attente…", size=12, color=theme.MUTED)
+        self._desc = ft.Text(t("current_weather_section", "waiting"), size=12, color=theme.MUTED)
         self._icon = ft.Icon(ft.Icons.WB_SUNNY, color="#F59E0B", size=30)
         self._chip_hum = ft.Text("--%", size=11, color=theme.MUTED)
         self._chip_wind = ft.Text("-- m/s", size=11, color=theme.MUTED)
-        self._chip_feel = ft.Text("--°C ressenti", size=11, color=theme.MUTED)
+        self._chip_feel = ft.Text(t("current_weather_section", "feels_chip", v="--"), size=11, color=theme.MUTED)
         self._history_cells: list[ft.Container] = []
 
     def build(self) -> ft.Control:
@@ -118,7 +119,7 @@ class CurrentWeatherSection(WeatherSection):
                     ),
                     ft.Divider(height=20, color=theme.BORDER),
                     ft.Text(
-                        "Historique récent (7 dernières mesures)",
+                        t("current_weather_section", "history_title"),
                         size=10,
                         color=theme.MUTED,
                         weight=ft.FontWeight.W_500,
@@ -179,16 +180,20 @@ class CurrentWeatherSection(WeatherSection):
         """
         self.history.append(w)
         self._temp.value = f"{w.temperature_c:.0f}°C"
-        self._desc.value = f"{w.description.capitalize()} · {self._pretty_ts(w.timestamp)}"
 
         icon, token = WeatherIcons.for_condition(w.condition)
         self._icon.icon = UIComponents.icon_name(icon)
         self._icon.color = UIComponents.COLOR_TOKENS[token]
 
+        # La description de l'API est un texte libre dans une langue imposée par
+        # l'API ; on affiche plutôt le libellé traduit du token météo (déduit de
+        # la condition, comme l'icône) pour rester cohérent avec la langue de l'UI.
+        self._desc.value = f"{t('conditions', 'token_' + token)} · {self._pretty_ts(w.timestamp)}"
+
         self._chip_hum.value = f"{w.humidity_pct}%"
-        gust = f" (raf. {w.wind_gust_ms:.0f})" if w.wind_gust_ms else ""
+        gust = t("current_weather_section", "gust", v=f"{w.wind_gust_ms:.0f}") if w.wind_gust_ms else ""
         self._chip_wind.value = f"{w.wind_speed_ms:.1f} m/s{gust}"
-        self._chip_feel.value = f"{w.feels_like_c:.0f}°C ressenti"
+        self._chip_feel.value = t("current_weather_section", "feels_chip", v=f"{w.feels_like_c:.0f}")
 
         self._refresh_history()
 
@@ -203,12 +208,12 @@ class CurrentWeatherSection(WeatherSection):
         """
         self.history.clear()
         self._temp.value = "--°C"
-        self._desc.value = "En attente…"
+        self._desc.value = t("current_weather_section", "waiting")
         self._icon.icon = UIComponents.icon_name(ft.Icons.WB_SUNNY)
         self._icon.color = "#F59E0B"
         self._chip_hum.value = "--%"
         self._chip_wind.value = "-- m/s"
-        self._chip_feel.value = "--°C ressenti"
+        self._chip_feel.value = t("current_weather_section", "feels_chip", v="--")
         self._refresh_history()
 
     def _refresh_history(self) -> None:
@@ -241,22 +246,27 @@ class CurrentWeatherSection(WeatherSection):
 
     @staticmethod
     def _pretty_ts(ts: str) -> str:
-        """Formate un timestamp ISO en libellé lisible (ex. « Lundi 26 mai · 14:07 »).
+        """Formate un timestamp ISO en libellé lisible et localisé.
+
+        Les noms de jour et de mois proviennent du namespace ``datetime`` afin
+        de suivre la langue active (ex. « Lundi 26 mai · 14:07 », « Monday 26 May
+        · 14:07 », « lunes 26 may. · 14:07 »).
 
         Args:
             ts (str): Timestamp au format ISO 8601 (ex. ``"2024-05-26T14:07:00Z"``).
 
         Returns:
-            str: Libellé formaté et capitalisé, ou la chaîne d'origine si non parsable.
+            str: Libellé formaté et localisé, ou la chaîne d'origine si non parsable.
         """
         try:
-            return (
-                datetime.fromisoformat(ts.replace("Z", "+00:00"))
-                .strftime("%A %d %b · %H:%M")
-                .capitalize()
-            )
+            dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
         except Exception:
             return ts
+        weekdays = tr_list("datetime", "weekdays")
+        months = tr_list("datetime", "months")
+        weekday = weekdays[dt.weekday()] if len(weekdays) == 7 else dt.strftime("%A")
+        month = months[dt.month - 1] if len(months) == 12 else dt.strftime("%b")
+        return f"{weekday.capitalize()} {dt.strftime('%d')} {month} · {dt.strftime('%H:%M')}"
 
     @staticmethod
     def _hour_or_dash(ts: str) -> str:

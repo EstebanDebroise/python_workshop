@@ -71,6 +71,10 @@ class WeatherApp:
         self.dashboard: DashboardView | None = None
         self.client: ApiWeatherClient | None = None
         self.notifications = NotificationService(page)
+        # État de l'écran courant, pour pouvoir le reconstruire lors d'un
+        # changement de langue. ``None`` tant que rien n'est affiché.
+        self._screen: str | None = None
+        self._screen_args: tuple = ()
         self._configure_page()
         self._show_setup()
 
@@ -83,8 +87,13 @@ class WeatherApp:
 
     def _show_setup(self) -> None:
         """Displays the configuration screen and disables global scrolling."""
+        self._screen = "setup"
+        self._screen_args = ()
         self.page.scroll = None
-        setup = SetupView(on_submit=self._on_setup_submitted)
+        setup = SetupView(
+            on_submit=self._on_setup_submitted,
+            on_language_change=self._rebuild_current,
+        )
         self.page.controls.clear()
         self.page.add(setup.build())
         self.page.update()
@@ -98,17 +107,37 @@ class WeatherApp:
 
     def _show_dashboard(self, city: str, profile: str, topic: str) -> None:
         """Instantiates the dashboard, replaces controls and enables scrolling."""
+        self._screen = "dashboard"
+        self._screen_args = (city, profile, topic)
         self.dashboard = DashboardView(
             city,
             profile,
             topic,
             notification_service=self.notifications,
             on_settings_save=self._on_settings_save,
+            on_language_change=self._rebuild_current,
         )
         self.page.scroll = ft.ScrollMode.AUTO
         self.page.controls.clear()
         self.page.add(self.dashboard.build())
         self.page.update()
+
+    def _rebuild_current(self) -> None:
+        """Reconstruit l'écran courant dans la langue active.
+
+        Appelé après un changement de langue depuis le sélecteur. Sur le
+        dashboard, réapplique la dernière mesure connue (``prev_weather``) pour
+        ne pas perdre l'affichage en attendant le prochain relevé. Le client
+        d'API n'est pas redémarré : seule l'interface est reconstruite.
+        """
+        if self._screen == "setup":
+            self._show_setup()
+        elif self._screen == "dashboard":
+            city, profile, topic = self._screen_args
+            self._show_dashboard(city, profile, topic)
+            if self.dashboard is not None and self.prev_weather is not None:
+                self.dashboard.update_weather(self.prev_weather)
+                self.page.update()
 
     def _on_settings_save(self, city: str, profile: str) -> None:
         """Applies new settings when location changes.
@@ -119,6 +148,7 @@ class WeatherApp:
         fetch the correct data.
         """
         topic = re.sub(r"[^A-Za-z0-9_.\-]", "_", city.lower())
+        self._screen_args = (city, profile, topic)
         self._register_location(city)
         self.prev_weather = None
         if self.dashboard is not None:

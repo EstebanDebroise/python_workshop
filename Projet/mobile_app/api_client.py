@@ -5,6 +5,7 @@ from typing import Callable, Optional
 
 import requests
 
+import i18n
 from models import Weather
 
 
@@ -58,7 +59,7 @@ class ApiWeatherClient:
         self._stop.set()
 
     def _run(self) -> None:
-        self.on_status(f"Connecting to API for « {self.topic} »…")
+        self.on_status(i18n.t("messages", "status_connecting", topic=self.topic))
         while not self._stop.is_set():
             self._poll_once()
             # ``wait`` allows reactive shutdown without waiting for the interval to complete.
@@ -72,7 +73,7 @@ class ApiWeatherClient:
             resp.raise_for_status()
             data = resp.json()
         except requests.RequestException as exc:
-            self.on_status(f"API unreachable: {exc}")
+            self.on_status(i18n.t("messages", "status_unreachable", error=exc))
             return
 
         status = data.get("status")
@@ -84,8 +85,8 @@ class ApiWeatherClient:
                     self.on_weather(Weather.from_message(data["message"]))
                 except Exception:
                     pass
-            self.on_status(f"Active stream via API · offset {offset}")
+            self.on_status(i18n.t("messages", "status_active", offset=offset))
         elif status == "empty":
-            self.on_status(f"Waiting for data on « {self.topic} »…")
+            self.on_status(i18n.t("messages", "status_waiting", topic=self.topic))
         else:
-            self.on_status(f"API error: {data.get('detail') or 'unknown'}")
+            self.on_status(i18n.t("messages", "status_error", detail=data.get("detail") or "unknown"))
