@@ -29,8 +29,8 @@ def fetch_kafka_topics() -> list:
         response.raise_for_status()
         data = response.json()
         if isinstance(data, dict):
-            return [data.get("name")] if data.get("name") else []
-        return [location.get("name") for location in data if isinstance(location, dict) and location.get("name")]
+            return [data.get("topic")] if data.get("topic") else []
+        return [location.get("topic") for location in data if isinstance(location, dict) and location.get("topic")]
     except requests.RequestException as e:
         print(f"[ERREUR] Impossible de récupérer les topics depuis l'API : {e}", file=sys.stderr)
         return []
