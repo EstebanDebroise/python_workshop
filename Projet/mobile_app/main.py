@@ -159,12 +159,36 @@ class WeatherApp:
 
     # ----- callbacks (executed in the API client thread) -----
 
+    def _dispatch_ui(self, apply) -> None:
+        """Runs a UI mutation on Flet's event loop thread.
+
+        The API client callbacks run in a background polling thread. In Flet
+        0.85 a ``page.update()`` issued from another thread enqueues the patch
+        but never wakes the loop's send task, so the client is never
+        refreshed. ``page.run_task`` marshals the work onto the loop thread
+        (via ``asyncio.run_coroutine_threadsafe``), which makes both the
+        control mutations and the ``page.update()`` take effect.
+        """
+
+        async def _runner() -> None:
+            apply()
+
+        try:
+            self.page.run_task(_runner)
+        except Exception:
+            # No active session/loop yet (e.g. shutting down): drop silently.
+            pass
+
     def _on_status(self, text: str) -> None:
         """Relays a Kafka status message to the dashboard header."""
         if self.dashboard is None:
             return
-        self.dashboard.set_status(text)
-        self.page.update()
+
+        def apply() -> None:
+            self.dashboard.set_status(text)
+            self.page.update()
+
+        self._dispatch_ui(apply)
 
     def _on_new_weather(self, w: Weather) -> None:
         """Updates the dashboard and emits change notifications.
@@ -177,11 +201,18 @@ class WeatherApp:
         """
         if self.dashboard is None:
             return
-        self.dashboard.update_weather(w)
-        for msg in WeatherNotifier.change_notifications(self.prev_weather, w):
-            self.notifications.notify("Météo Agri", msg)
+
+        # Pure logic (no UI access) can stay on the polling thread.
+        messages = WeatherNotifier.change_notifications(self.prev_weather, w)
         self.prev_weather = w
-        self.page.update()
+
+        def apply() -> None:
+            self.dashboard.update_weather(w)
+            for msg in messages:
+                self.notifications.notify("Météo Agri", msg)
+            self.page.update()
+
+        self._dispatch_ui(apply)
 
     @staticmethod
     def main(page: ft.Page) -> None:
