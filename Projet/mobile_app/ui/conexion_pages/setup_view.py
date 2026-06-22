@@ -1,4 +1,4 @@
-"""Écran de configuration initiale : saisie de la ville et du profil utilisateur."""
+"""Initial setup screen: enter city and user profile."""
 
 from __future__ import annotations
 
@@ -16,13 +16,13 @@ from ui.language_selector import LanguageSelector
 
 @dataclass
 class SetupResult:
-    """Données collectées par l'écran de configuration et transmises à l'orchestrateur.
+    """Data collected by the setup screen and transmitted to the orchestrator.
 
-    Attributs :
-        city (str): Nom de la ville saisi par l'utilisateur, non normalisé.
-            La normalisation en topic Kafka est effectuée par l'appelant.
-        profile (str): Profil utilisateur sélectionné dans le menu déroulant
-            (ex. ``"Éleveur laitier"``, ``"Agriculteur"``).
+    Attributes:
+        city (str): City name entered by the user, not normalized.
+            Normalization to Kafka topic is performed by the caller.
+        profile (str): User profile selected from the dropdown menu
+            (e.g. ``"Dairy Farmer"``, ``"Crop Farmer"``).
     """
 
     city: str
@@ -30,15 +30,15 @@ class SetupResult:
 
 
 class SetupView(Buildable):
-    """Vue de configuration initiale de l'application.
+    """Initial application setup view.
 
-    Implémente :class:`Buildable`. Affiche un formulaire centré composé d'un
-    champ texte pour la ville et d'un menu déroulant pour le profil. Déclenche
-    le callback ``on_submit`` avec un :class:`SetupResult` lors de la validation.
+    Implements :class:`Buildable`. Displays a centered form with a text field
+    for the city and a dropdown menu for the profile. Triggers the ``on_submit``
+    callback with a :class:`SetupResult` when validated.
 
-    La vue est passive : elle ne gère ni Kafka ni la navigation entre écrans.
-    Elle se contente de valider la saisie minimale (ville non vide) et de
-    remonter les données à l'orchestrateur (:class:`WeatherApp`).
+    The view is passive: it handles neither Kafka nor navigation between screens.
+    It simply validates minimal input (non-empty city) and passes the data to
+    the orchestrator (:class:`WeatherApp`).
     """
 
     def __init__(
@@ -46,19 +46,19 @@ class SetupView(Buildable):
         on_submit: Callable[[SetupResult], None],
         on_language_change: Callable[[], None] | None = None,
     ) -> None:
-        """Prépare les contrôles du formulaire sans les attacher à la page.
+        """Prepare form controls without attaching them to the page.
 
         Args:
-            on_submit (Callable[[SetupResult], None]): Callback appelé lors de la
-                validation du formulaire. Reçoit un :class:`SetupResult` contenant
-                la ville et le profil saisis. L'appelant est responsable de la
-                transition vers le dashboard.
-            on_language_change (Callable[[], None] | None): Callback appelé après
-                un changement de langue, pour que l'orchestrateur reconstruise
-                l'écran dans la nouvelle langue.
+            on_submit (Callable[[SetupResult], None]): Callback called when the form
+                is validated. Receives a :class:`SetupResult` containing the entered
+                city and profile. The caller is responsible for transitioning to the
+                dashboard.
+            on_language_change (Callable[[], None] | None): Callback called after
+                a language change, so the orchestrator can rebuild the screen in the
+                new language.
 
         Returns:
-            None — :meth:`build` doit être appelé pour obtenir le contrôle Flet.
+            None — :meth:`build` must be called to get the Flet control.
         """
         self.on_submit = on_submit
         self._language = LanguageSelector(on_language_change or (lambda: None), compact=True)
@@ -84,17 +84,17 @@ class SetupView(Buildable):
         self._error = ft.Text("", color=theme.RED, size=12)
 
     def build(self) -> ft.Control:
-        """Construit l'arbre Flet complet de l'écran de configuration.
+        """Build the complete Flet tree for the setup screen.
 
-        Produit une page centrée avec le logo, le sous-titre de l'application
-        et la carte de formulaire (ville + profil + bouton Démarrer).
+        Produces a centered page with the logo, application subtitle,
+        and form card (city + profile + Start button).
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            ft.Control: ``Container`` expansif avec fond gris (``theme.BG``),
-                centré horizontalement, contenant le logo et le formulaire de saisie.
+            ft.Control: Expandable ``Container`` with gray background (``theme.BG``),
+                horizontally centered, containing the logo and input form.
         """
         return ft.Container(
             expand=True,
@@ -161,18 +161,18 @@ class SetupView(Buildable):
         )
 
     def _submit(self) -> None:
-        """Valide la saisie et transmet le résultat via le callback ``on_submit``.
+        """Validate input and transmit the result via the ``on_submit`` callback.
 
-        Vérifie que le champ ville n'est pas vide. En cas d'erreur, affiche un
-        message en place et interrompt la soumission. En cas de succès, appelle
-        ``on_submit`` avec le :class:`SetupResult` construit à partir des valeurs
-        saisies. Le profil par défaut est ``"Agriculteur"`` si rien n'est sélectionné.
+        Verifies that the city field is not empty. On error, displays a message
+        in-place and stops submission. On success, calls ``on_submit`` with the
+        :class:`SetupResult` built from the entered values. The default profile is
+        ``"crops"`` if nothing is selected.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            None — appelle ``on_submit`` en cas de succès, met à jour ``_error`` sinon.
+            None — calls ``on_submit`` on success, updates ``_error`` otherwise.
         """
         city = (self._city.value or "").strip()
         if not city:

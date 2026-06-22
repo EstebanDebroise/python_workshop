@@ -1,4 +1,4 @@
-"""Fabrique de composants Flet réutilisables pour l'ensemble de l'application."""
+"""Factory for reusable Flet components across the entire application."""
 
 from __future__ import annotations
 
@@ -8,16 +8,15 @@ import theme
 
 
 class UIComponents:
-    """Fabrique statique de composants Flet réutilisables.
+    """Static factory for reusable Flet components.
 
-    Regroupe sous forme de méthodes statiques tous les éléments visuels partagés :
-    cartes, bandeaux d'alerte, cellules statistiques, items de navigation et
-    labels de section. Aucune instanciation n'est nécessaire.
+    Groups all shared visual elements as static methods: cards, alert banners,
+    stat cells, navigation items, and section labels. No instantiation needed.
 
-    Attribut de classe :
-        COLOR_TOKENS (dict[str, str]): Mapping token sémantique → couleur hexadécimale.
-            Relie la couche métier (analytics) à la couche UI sans que la logique
-            métier n'ait besoin d'importer Flet ou de connaître les couleurs exactes.
+    Class Attributes:
+        COLOR_TOKENS (dict[str, str]): Semantic token → hexadecimal color mapping.
+            Connects the business layer (analytics) to the UI layer without
+            requiring the business logic to import Flet or know exact colors.
     """
 
     COLOR_TOKENS: dict[str, str] = {
@@ -35,18 +34,18 @@ class UIComponents:
 
     @staticmethod
     def icon_name(name: "str | ft.Icons") -> ft.Icons:
-        """Convertit un identifiant snake_case en membre ``ft.Icons`` correspondant.
+        """Convert a snake_case identifier to the corresponding ``ft.Icons`` member.
 
-        Permet à la couche métier de manipuler des chaînes neutres (ex. ``wb_sunny``)
-        sans importer Flet directement. Accepte aussi un membre ``ft.Icons`` déjà
-        résolu, qui est alors renvoyé tel quel.
+        Allows the business layer to manipulate neutral strings (e.g. ``wb_sunny``)
+        without directly importing Flet. Also accepts an already-resolved ``ft.Icons``
+        member, which is returned as-is.
 
         Args:
-            name (str | ft.Icons): Nom de l'icône en snake_case (ex. ``"wb_sunny"``,
-                ``"home_work"``) ou un membre ``ft.Icons``.
+            name (str | ft.Icons): Icon name in snake_case (e.g. ``"wb_sunny"``,
+                ``"home_work"``) or an ``ft.Icons`` member.
 
         Returns:
-            ft.Icons: Le membre d'énumération Flet correspondant.
+            ft.Icons: The corresponding Flet enumeration member.
         """
         if isinstance(name, str):
             return getattr(ft.Icons, name.upper())
@@ -54,14 +53,14 @@ class UIComponents:
 
     @staticmethod
     def section_label(text: str) -> ft.Text:
-        """Crée un libellé de section en capitales, style sous-titre discret et monospace.
+        """Create a section label in capitals with a subtle monospace subtitle style.
 
         Args:
-            text (str): Texte du libellé. Sera automatiquement converti en majuscules.
+            text (str): Label text. Will be automatically converted to uppercase.
 
         Returns:
-            ft.Text: Contrôle texte stylisé (taille 10, monospace, couleur atténuée),
-                prêt à être inséré avant chaque section du dashboard.
+            ft.Text: Styled text control (size 10, monospace, muted color),
+                ready to be inserted before each dashboard section.
         """
         return ft.Text(
             text.upper(),
@@ -73,18 +72,17 @@ class UIComponents:
 
     @staticmethod
     def card(content: ft.Control) -> ft.Container:
-        """Enveloppe un contrôle dans la carte blanche standard de l'application.
+        """Wrap a control in the application's standard white card.
 
-        Applique le fond blanc, la bordure grise, le rayon de coin et le padding
-        définis par la charte graphique. Utilisé par toutes les sections du dashboard.
+        Applies the white background, gray border, corner radius, and padding
+        defined by the design system. Used by all dashboard sections.
 
         Args:
-            content (ft.Control): Le contrôle ou la colonne à afficher à l'intérieur
-                de la carte.
+            content (ft.Control): The control or column to display inside the card.
 
         Returns:
-            ft.Container: Carte avec fond blanc (``theme.CARD``), bordure grise
-                (``theme.BORDER``), coins arrondis à 18 px et padding de 16 px.
+            ft.Container: Card with white background (``theme.CARD``), gray border
+                (``theme.BORDER``), 18 px rounded corners, and 16 px padding.
         """
         return ft.Container(
             content=content,
@@ -96,22 +94,22 @@ class UIComponents:
 
     @staticmethod
     def alert_strip(icon: str, text: str, fg: str, bg: str, border_color: str) -> ft.Container:
-        """Crée un bandeau d'alerte horizontal entièrement paramétrable.
+        """Create a fully parameterizable horizontal alert banner.
 
-        Sert de brique de base pour tous les helpers spécialisés
-        (``cold_alert``, ``sun_alert``, ``warn_alert``, etc.) qui délèguent ici
-        en ne fournissant que le triplet de couleurs adapté à leur type d'alerte.
+        Serves as the base building block for all specialized helpers
+        (``cold_alert``, ``sun_alert``, ``warn_alert``, etc.) which delegate here,
+        providing only the color triplet suited to their alert type.
 
         Args:
-            icon (str): Identifiant Flet de l'icône à afficher (ex. ``ft.Icons.WARNING``).
-            text (str): Message d'alerte à afficher à côté de l'icône.
-            fg (str): Couleur hexadécimale appliquée à l'icône et au texte.
-            bg (str): Couleur hexadécimale du fond du bandeau.
-            border_color (str): Couleur hexadécimale de la bordure du bandeau.
+            icon (str): Flet icon identifier to display (e.g. ``ft.Icons.WARNING``).
+            text (str): Alert message to display next to the icon.
+            fg (str): Hexadecimal color applied to the icon and text.
+            bg (str): Hexadecimal color for the banner background.
+            border_color (str): Hexadecimal color for the banner border.
 
         Returns:
-            ft.Container: Bandeau avec icône, texte expansif, fond et bordure colorés,
-                coins arrondis à 10 px.
+            ft.Container: Banner with icon, expanded text, colored background and border,
+                10 px rounded corners.
         """
         return ft.Container(
             content=ft.Row(
@@ -129,85 +127,85 @@ class UIComponents:
 
     @staticmethod
     def cold_alert(icon: str, text: str) -> ft.Container:
-        """Crée un bandeau d'alerte froid (abriter les animaux), tons bleus.
+        """Create a cold alert banner (shelter animals) with blue tones.
 
         Args:
-            icon (str): Identifiant Flet de l'icône à afficher.
-            text (str): Message d'alerte à afficher (ex. "Abriter veaux et agneaux.").
+            icon (str): Flet icon identifier to display.
+            text (str): Alert message to display (e.g. "Shelter calves and lambs.").
 
         Returns:
-            ft.Container: Bandeau bleu clair (``theme.SKY_PALE``) adapté aux alertes de froid.
+            ft.Container: Light blue banner (``theme.SKY_PALE``) suited for cold alerts.
         """
         return UIComponents.alert_strip(icon, text, theme.SKY_DARK, theme.SKY_PALE, "#B3E5FC")
 
     @staticmethod
     def sun_alert(icon: str, text: str) -> ft.Container:
-        """Crée un bandeau d'alerte ensoleillement intense (ombre requise), tons jaunes.
+        """Create an intense sunlight alert banner (shade required) with yellow tones.
 
         Args:
-            icon (str): Identifiant Flet de l'icône à afficher.
-            text (str): Message d'alerte à afficher (ex. "Ombre obligatoire.").
+            icon (str): Flet icon identifier to display.
+            text (str): Alert message to display (e.g. "Shade required.").
 
         Returns:
-            ft.Container: Bandeau jaune pâle adapté aux alertes d'ensoleillement maximal.
+            ft.Container: Pale yellow banner suited for maximum sun exposure alerts.
         """
         return UIComponents.alert_strip(icon, text, "#E65100", "#FFF9C4", "#FFF176")
 
     @staticmethod
     def warn_alert(icon: str, text: str) -> ft.Container:
-        """Crée un bandeau d'avertissement générique, tons ambre.
+        """Create a generic warning banner with amber tones.
 
         Args:
-            icon (str): Identifiant Flet de l'icône à afficher.
-            text (str): Message d'avertissement à afficher.
+            icon (str): Flet icon identifier to display.
+            text (str): Warning message to display.
 
         Returns:
-            ft.Container: Bandeau ambre pâle (``theme.AMBER_PALE``) pour avertissements.
+            ft.Container: Pale amber banner (``theme.AMBER_PALE``) for warnings.
         """
         return UIComponents.alert_strip(icon, text, "#B45309", theme.AMBER_PALE, "#FDE68A")
 
     @staticmethod
     def danger_alert(icon: str, text: str) -> ft.Container:
-        """Crée un bandeau de danger critique, tons rouges.
+        """Create a critical danger banner with red tones.
 
         Args:
-            icon (str): Identifiant Flet de l'icône à afficher.
-            text (str): Message de danger à afficher (ex. "Ventilation requise.").
+            icon (str): Flet icon identifier to display.
+            text (str): Danger message to display (e.g. "Ventilation required.").
 
         Returns:
-            ft.Container: Bandeau rouge pâle (``theme.RED_PALE``) pour alertes critiques.
+            ft.Container: Pale red banner (``theme.RED_PALE``) for critical alerts.
         """
         return UIComponents.alert_strip(icon, text, theme.RED, theme.RED_PALE, "#FFCDD2")
 
     @staticmethod
     def info_alert(icon: str, text: str) -> ft.Container:
-        """Crée un bandeau informatif sobre (confirmation push, etc.), tons ocres.
+        """Create a subtle informational banner (push confirmation, etc.) with ochre tones.
 
         Args:
-            icon (str): Identifiant Flet de l'icône à afficher.
-            text (str): Message informatif à afficher.
+            icon (str): Flet icon identifier to display.
+            text (str): Informational message to display.
 
         Returns:
-            ft.Container: Bandeau ocre clair (``#FFF8E1``) pour messages de confirmation.
+            ft.Container: Light ochre banner (``#FFF8E1``) for confirmation messages.
         """
         return UIComponents.alert_strip(icon, text, "#92400E", "#FFF8E1", "#FFE082")
 
     @staticmethod
     def stat_cell(value_ctrl: ft.Text, unit: str, label: str) -> ft.Container:
-        """Crée une cellule statistique centrée affichant valeur numérique, unité et libellé.
+        """Create a centered statistic cell displaying numeric value, unit, and label.
 
-        Le paramètre ``value_ctrl`` est passé par référence afin que la section
-        propriétaire puisse le mettre à jour en place sans reconstruire la cellule.
+        The ``value_ctrl`` parameter is passed by reference so the owning section
+        can update it in-place without rebuilding the cell.
 
         Args:
-            value_ctrl (ft.Text): Contrôle texte contenant la valeur numérique,
-                créé et géré par la section appelante pour permettre les mises à jour.
-            unit (str): Unité affichée en petit à droite de la valeur (ex. ``"°C"``, ``"m/s"``).
-            label (str): Libellé descriptif affiché sous la valeur (ex. ``"Température réelle"``).
+            value_ctrl (ft.Text): Text control containing the numeric value,
+                created and managed by the calling section to allow updates.
+            unit (str): Unit displayed small to the right of the value (e.g. ``"°C"``, ``"m/s"``).
+            label (str): Descriptive label displayed below the value (e.g. ``"Actual Temperature"``).
 
         Returns:
-            ft.Container: Cellule grise (``theme.BG``) extensible horizontalement,
-                avec coins arrondis et alignement centré.
+            ft.Container: Gray cell (``theme.BG``) horizontally expandable,
+                with rounded corners and center alignment.
         """
         return ft.Container(
             content=ft.Column(
@@ -230,17 +228,17 @@ class UIComponents:
 
     @staticmethod
     def nav_item(icon: str, label: str, active: bool) -> ft.Container:
-        """Crée un item de barre de navigation inférieure avec icône et libellé.
+        """Create a bottom navigation bar item with icon and label.
 
         Args:
-            icon (str): Identifiant Flet de l'icône à afficher (ex. ``ft.Icons.DASHBOARD``).
-            label (str): Libellé textuel de l'onglet (ex. ``"Tableau"``).
-            active (bool): Si ``True``, l'item est mis en surbrillance verte (``theme.GREEN``) ;
-                sinon il est affiché en couleur atténuée (``theme.MUTED``).
+            icon (str): Flet icon identifier to display (e.g. ``ft.Icons.DASHBOARD``).
+            label (str): Textual label for the tab (e.g. ``"Dashboard"``).
+            active (bool): If ``True``, the item is highlighted green (``theme.GREEN``);
+                otherwise displayed in muted color (``theme.MUTED``).
 
         Returns:
-            ft.Container: Item de navigation centré et extensible horizontalement,
-                prêt à être placé dans une ``Row`` de la barre inférieure.
+            ft.Container: Navigation item centered and horizontally expandable,
+                ready to be placed in a ``Row`` of the bottom bar.
         """
         color = theme.GREEN if active else theme.MUTED
         return ft.Container(

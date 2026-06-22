@@ -1,4 +1,4 @@
-"""Section météo actuelle : température principale, icône, chips et historique."""
+"""Current weather section: main temperature, icon, chips, and history."""
 
 from __future__ import annotations
 
@@ -16,31 +16,31 @@ from ui.components import UIComponents
 
 
 class CurrentWeatherSection(WeatherSection):
-    """Carte affichant la météo actuelle avec température, icône, chips et ruban historique.
+    """Card displaying current weather with temperature, icon, chips, and history ribbon.
 
-    Implémente :class:`WeatherSection`. Conserve en mémoire les ``HISTORY_LEN``
-    dernières mesures météo dans une file circulaire (``deque``) et les affiche
-    sous forme de ruban de cellules en bas de la carte. Les cellules du ruban sont
-    créées une seule fois lors du :meth:`build` puis mises à jour en place.
+    Implements :class:`WeatherSection`. Stores the last ``HISTORY_LEN`` weather
+    measurements in a circular queue (``deque``) and displays them as a ribbon
+    of cells at the bottom of the card. The ribbon cells are created once during
+    :meth:`build` and then updated in-place.
 
-    Attribut de classe :
-        HISTORY_LEN (int): Taille maximale de la file d'historique (7 par défaut).
+    Class Attributes:
+        HISTORY_LEN (int): Maximum size of the history queue (7 by default).
     """
 
     HISTORY_LEN = 7
 
     def __init__(self) -> None:
-        """Initialise les contrôles Flet internes et la file d'historique bornée.
+        """Initialize internal Flet controls and bounded history queue.
 
-        Tous les contrôles texte (température, description, chips) et l'icône
-        sont créés ici avec des valeurs par défaut (``"--"``). Les cellules du
-        ruban historique sont créées lors de :meth:`build`.
+        All text controls (temperature, description, chips) and the icon are
+        created here with default values (``"--"``). The history ribbon cells
+        are created during :meth:`build`.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            None — :meth:`build` doit être appelé pour obtenir le contrôle Flet.
+            None — :meth:`build` must be called to get the Flet control.
         """
         self.history: deque[Weather] = deque(maxlen=self.HISTORY_LEN)
         self._temp = ft.Text("--°C", size=32, weight=ft.FontWeight.BOLD, color=theme.TEXT)
@@ -52,17 +52,17 @@ class CurrentWeatherSection(WeatherSection):
         self._history_cells: list[ft.Container] = []
 
     def build(self) -> ft.Control:
-        """Construit la carte météo complète avec en-tête principal et ruban d'historique.
+        """Build the complete weather card with main header and history ribbon.
 
-        Crée les 7 cellules du ruban via :meth:`_build_history_row` et conserve
-        leurs références pour les mises à jour ultérieures.
+        Creates the 7 ribbon cells via :meth:`_build_history_row` and keeps
+        their references for future updates.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            ft.Control: Carte blanche contenant l'icône météo, la température principale,
-                les chips (humidité, vent, ressenti) et le ruban des 7 dernières mesures.
+            ft.Control: White card containing the weather icon, main temperature,
+                chips (humidity, wind, feels-like), and the ribbon of the last 7 measurements.
         """
         history_row = self._build_history_row()
         return UIComponents.card(
@@ -131,16 +131,16 @@ class CurrentWeatherSection(WeatherSection):
         )
 
     def _build_history_row(self) -> ft.Row:
-        """Crée les 7 cellules vides du ruban historique et en conserve les références internes.
+        """Create the 7 empty history ribbon cells and keep internal references.
 
-        Chaque cellule stocke ses sous-contrôles dans ``cell.data`` pour permettre
-        les mises à jour en place sans reconstruire l'arbre.
+        Each cell stores its sub-controls in ``cell.data`` to allow in-place
+        updates without rebuilding the tree.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            ft.Row: Ligne contenant les 7 cellules historiques initialisées à ``"—"`` / ``"--°"``.
+            ft.Row: Row containing 7 history cells initialized to ``"—"`` / ``"--°"``.
         """
         cells = []
         for _ in range(self.HISTORY_LEN):
@@ -165,18 +165,18 @@ class CurrentWeatherSection(WeatherSection):
         return ft.Row(cells, spacing=6)
 
     def update(self, w: Weather) -> None:
-        """Met à jour la carte principale et ajoute la mesure à la file d'historique.
+        """Update the main card and add the measurement to the history queue.
 
-        Met à jour en place la température, la description, l'icône, les chips,
-        puis rafraîchit le ruban d'historique via :meth:`_refresh_history`.
+        Updates in-place the temperature, description, icon, chips, then refreshes
+        the history ribbon via :meth:`_refresh_history`.
 
         Args:
-            w (Weather): La nouvelle mesure météo à afficher. Ses champs ``temperature_c``,
+            w (Weather): The new weather measurement to display. Its fields ``temperature_c``,
                 ``description``, ``condition``, ``humidity_pct``, ``wind_speed_ms``,
-                ``wind_gust_ms``, ``feels_like_c`` et ``timestamp`` sont utilisés.
+                ``wind_gust_ms``, ``feels_like_c``, and ``timestamp`` are used.
 
         Returns:
-            None — les contrôles Flet sont modifiés en place.
+            None — the Flet controls are modified in-place.
         """
         self.history.append(w)
         self._temp.value = f"{w.temperature_c:.0f}°C"
@@ -185,9 +185,9 @@ class CurrentWeatherSection(WeatherSection):
         self._icon.icon = UIComponents.icon_name(icon)
         self._icon.color = UIComponents.COLOR_TOKENS[token]
 
-        # La description de l'API est un texte libre dans une langue imposée par
-        # l'API ; on affiche plutôt le libellé traduit du token météo (déduit de
-        # la condition, comme l'icône) pour rester cohérent avec la langue de l'UI.
+        # The API description is free text in a language imposed by the API; instead,
+        # display the translated label of the weather token (derived from the condition,
+        # like the icon) to stay consistent with the UI language.
         self._desc.value = f"{t('conditions', 'token_' + token)} · {self._pretty_ts(w.timestamp)}"
 
         self._chip_hum.value = f"{w.humidity_pct}%"
@@ -198,13 +198,13 @@ class CurrentWeatherSection(WeatherSection):
         self._refresh_history()
 
     def reset(self) -> None:
-        """Vide l'historique et remet la carte météo à son état d'attente.
+        """Clear the history and reset the weather card to waiting state.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            None — les contrôles Flet sont modifiés en place.
+            None — the Flet controls are modified in-place.
         """
         self.history.clear()
         self._temp.value = "--°C"
@@ -217,16 +217,16 @@ class CurrentWeatherSection(WeatherSection):
         self._refresh_history()
 
     def _refresh_history(self) -> None:
-        """Reflète l'état courant de la file d'historique dans les cellules du ruban.
+        """Reflect the current state of the history queue in the ribbon cells.
 
-        Parcourt les 7 cellules dans l'ordre d'insertion. Les cellules sans mesure
-        correspondante (file pas encore pleine) sont réinitialisées aux valeurs vides.
+        Iterates through the 7 cells in insertion order. Cells without a
+        corresponding measurement (queue not yet full) are reset to empty values.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            None — les cellules du ruban sont modifiées en place.
+            None — the ribbon cells are modified in-place.
         """
         items = list(self.history)
         for i, cell in enumerate(self._history_cells):
@@ -246,17 +246,16 @@ class CurrentWeatherSection(WeatherSection):
 
     @staticmethod
     def _pretty_ts(ts: str) -> str:
-        """Formate un timestamp ISO en libellé lisible et localisé.
+        """Format an ISO timestamp into a readable and localized label.
 
-        Les noms de jour et de mois proviennent du namespace ``datetime`` afin
-        de suivre la langue active (ex. « Lundi 26 mai · 14:07 », « Monday 26 May
-        · 14:07 », « lunes 26 may. · 14:07 »).
+        Day and month names come from the ``datetime`` namespace to follow the
+        active language (e.g. "Monday 26 May · 14:07", "lunes 26 may. · 14:07").
 
         Args:
-            ts (str): Timestamp au format ISO 8601 (ex. ``"2024-05-26T14:07:00Z"``).
+            ts (str): Timestamp in ISO 8601 format (e.g. ``"2024-05-26T14:07:00Z"``).
 
         Returns:
-            str: Libellé formaté et localisé, ou la chaîne d'origine si non parsable.
+            str: Formatted and localized label, or the original string if not parseable.
         """
         try:
             dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
@@ -270,14 +269,14 @@ class CurrentWeatherSection(WeatherSection):
 
     @staticmethod
     def _hour_or_dash(ts: str) -> str:
-        """Extrait l'heure au format ``HH:MM`` d'un timestamp ISO.
+        """Extract the time in ``HH:MM`` format from an ISO timestamp.
 
         Args:
-            ts (str): Timestamp au format ISO 8601.
+            ts (str): Timestamp in ISO 8601 format.
 
         Returns:
-            str: Heure au format ``"HH:MM"`` (ex. ``"14:07"``),
-                ou ``"—"`` si le timestamp n'est pas parsable.
+            str: Time in ``"HH:MM"`` format (e.g. ``"14:07"``),
+                or ``"—"`` if the timestamp is not parseable.
         """
         try:
             return datetime.fromisoformat(ts.replace("Z", "+00:00")).strftime("%H:%M")

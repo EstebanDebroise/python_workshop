@@ -1,4 +1,4 @@
-"""Page de réglages : modification de la ville et du type d'élevage."""
+"""Settings page: modify city and livestock type."""
 
 from __future__ import annotations
 
@@ -14,10 +14,10 @@ from ui.language_selector import LanguageSelector
 
 
 class SettingsView(Buildable):
-    """Page de réglages permettant à l'utilisateur de modifier sa ville et son profil.
+    """Settings page allowing the user to modify city and profile.
 
-    Implémente :class:`Buildable`. Affiche une carte avec un champ ville et un
-    menu déroulant de profil. Déclenche le callback ``on_save`` lors de la validation.
+    Implements :class:`Buildable`. Displays a card with a city text field and a
+    profile dropdown menu. Triggers the ``on_save`` callback when validated.
     """
 
     def __init__(
@@ -27,19 +27,19 @@ class SettingsView(Buildable):
         on_save: Callable[[str, str], None],
         on_language_change: Callable[[], None] | None = None,
     ) -> None:
-        """Prépare les contrôles du formulaire avec les valeurs actuelles.
+        """Prepare form controls with current values.
 
         Args:
-            city (str): Ville actuellement configurée, pré-remplie dans le champ texte.
-            profile (str): Code du profil actuellement configuré, pré-sélectionné
-                dans le menu (ex. ``"dairy"``).
-            on_save (Callable[[str, str], None]): Callback appelé avec ``(city, profile)``
-                lors de la validation. L'appelant est responsable de propager le changement.
-            on_language_change (Callable[[], None] | None): Callback appelé après
-                un changement de langue, pour reconstruire l'écran traduit.
+            city (str): Currently configured city, pre-filled in the text field.
+            profile (str): Code of the currently configured profile, pre-selected
+                in the menu (e.g. ``"dairy"``).
+            on_save (Callable[[str, str], None]): Callback called with ``(city, profile)``
+                when validation is done. The caller is responsible for propagating the change.
+            on_language_change (Callable[[], None] | None): Callback called after
+                a language change, to rebuild the translated screen.
 
         Returns:
-            None — :meth:`build` doit être appelé pour obtenir le contrôle Flet.
+            None — :meth:`build` must be called to get the Flet control.
         """
         self._on_save = on_save
         self._language = LanguageSelector(on_language_change or (lambda: None))
@@ -63,14 +63,14 @@ class SettingsView(Buildable):
         self._feedback = ft.Text("", size=12)
 
     def build(self) -> ft.Control:
-        """Construit la page de réglages avec la carte de formulaire.
+        """Build the settings page with the form card.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            ft.Control: ``Column`` contenant le label de section et la carte de formulaire,
-                dans la même charte graphique que les autres sections du dashboard.
+            ft.Control: ``Column`` containing the section label and form card,
+                following the same design as other dashboard sections.
         """
         return ft.Column(
             [
@@ -147,10 +147,10 @@ class SettingsView(Buildable):
         )
 
     def _save(self) -> None:
-        """Valide la saisie et déclenche le callback ``on_save``.
+        """Validate input and trigger the ``on_save`` callback.
 
-        Affiche un message d'erreur si la ville est vide, sinon appelle
-        ``on_save`` avec les valeurs saisies et affiche une confirmation.
+        Displays an error message if the city is empty, otherwise calls
+        ``on_save`` with the entered values and displays a confirmation.
 
         Returns:
             None

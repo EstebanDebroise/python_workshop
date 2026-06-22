@@ -1,4 +1,4 @@
-"""Page Alertes : activation des notifications de changement météo."""
+"""Alerts page: enable/disable weather change notifications."""
 
 from __future__ import annotations
 
@@ -12,14 +12,14 @@ from ui.components import UIComponents
 
 
 class NotificationsView(Buildable):
-    """Page permettant d'activer/désactiver les notifications d'alerte météo.
+    """Page to enable/disable weather alert notifications.
 
-    Implémente :class:`Buildable`. Affiche un interrupteur relié au
-    :class:`NotificationService` partagé : son état est persistant et pilote
-    l'envoi des notifications système déclenchées par la boucle de polling.
+    Implements :class:`Buildable`. Displays a switch linked to the shared
+    :class:`NotificationService`: its state is persistent and drives the
+    system notifications sent by the polling loop.
     """
 
-    #: Icône + clé de traduction des changements météo surveillés (affichés à titre informatif).
+    #: Icon + translation key for monitored weather changes (displayed for informational purposes).
     MONITORED = [
         (ft.Icons.THERMOSTAT, "monitored_thi"),
         (ft.Icons.WATER_DROP, "monitored_rain"),
@@ -27,11 +27,11 @@ class NotificationsView(Buildable):
     ]
 
     def __init__(self, service: NotificationService) -> None:
-        """Prépare l'interrupteur à partir de l'état courant du service.
+        """Prepare the switch from the current service state.
 
         Args:
-            service (NotificationService): Service partagé qui mémorise la
-                préférence d'activation et émet les notifications.
+            service (NotificationService): Shared service that stores the
+                activation preference and sends notifications.
         """
         self._service = service
         self._switch = ft.Switch(
@@ -49,7 +49,7 @@ class NotificationsView(Buildable):
         return t("notifications_view", "enabled_status" if enabled else "disabled_status")
 
     def _on_toggle(self, e: ft.ControlEvent) -> None:
-        """Persiste le nouvel état et met à jour le texte de statut."""
+        """Persist the new state and update the status text."""
         enabled = bool(self._switch.value)
         self._service.set_enabled(enabled)
         self._status.value = self._status_text(enabled)
@@ -69,11 +69,11 @@ class NotificationsView(Buildable):
         ]
 
     def build(self) -> ft.Control:
-        """Construit la page Alertes (interrupteur + liste des alertes surveillées).
+        """Build the Alerts page (toggle switch + list of monitored alerts).
 
         Returns:
-            ft.Control: ``Column`` reprenant la charte des autres sections
-                (label de section + cartes blanches).
+            ft.Control: ``Column`` following the design of other sections
+                (section label + white cards).
         """
         toggle_card = UIComponents.card(
             ft.Column(

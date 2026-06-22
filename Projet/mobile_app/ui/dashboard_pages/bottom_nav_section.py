@@ -1,4 +1,4 @@
-"""Section de navigation inférieure : barre fixe avec 4 onglets."""
+"""Bottom navigation section: fixed bar with 4 tabs."""
 
 from __future__ import annotations
 
@@ -13,11 +13,11 @@ from ui.components import UIComponents
 
 
 class BottomNavSection(Buildable):
-    """Barre de navigation inférieure fixe comportant 4 onglets.
+    """Fixed bottom navigation bar with 4 tabs.
 
-    Implémente :class:`Buildable`. Les onglets « Tableau », « Alertes » et
-    « Réglages » sont fonctionnels et déclenchent les callbacks fournis. Seul
-    l'onglet Historique reste visuellement présent mais non fonctionnel.
+    Implements :class:`Buildable`. The tabs "Dashboard", "Alerts", and
+    "Settings" are functional and trigger the provided callbacks. Only
+    the History tab remains visually present but is not functional.
     """
 
     def __init__(
@@ -26,18 +26,18 @@ class BottomNavSection(Buildable):
         on_alerts: Callable[[], None],
         on_settings: Callable[[], None],
     ) -> None:
-        """Prépare les contrôles des onglets actifs avec leurs refs d'icône/texte.
+        """Prepare active tab controls with their icon/text references.
 
         Args:
-            on_dashboard (Callable[[], None]): Callback déclenché lors du clic
-                sur l'onglet « Tableau ».
-            on_alerts (Callable[[], None]): Callback déclenché lors du clic
-                sur l'onglet « Alertes ».
-            on_settings (Callable[[], None]): Callback déclenché lors du clic
-                sur l'onglet « Réglages ».
+            on_dashboard (Callable[[], None]): Callback triggered on click
+                of the "Dashboard" tab.
+            on_alerts (Callable[[], None]): Callback triggered on click
+                of the "Alerts" tab.
+            on_settings (Callable[[], None]): Callback triggered on click
+                of the "Settings" tab.
 
         Returns:
-            None — :meth:`build` doit être appelé pour obtenir le contrôle Flet.
+            None — :meth:`build` must be called to get the Flet control.
         """
         self._on_dashboard = on_dashboard
         self._on_alerts = on_alerts
@@ -61,11 +61,11 @@ class BottomNavSection(Buildable):
         }
 
     def set_active(self, tab: str) -> None:
-        """Met à jour la couleur et le poids des onglets actifs/inactifs.
+        """Update the color and weight of active/inactive tabs.
 
         Args:
-            tab (str): Identifiant de l'onglet à activer (``"dashboard"``,
-                ``"alerts"`` ou ``"settings"``).
+            tab (str): Tab identifier to activate (``"dashboard"``,
+                ``"alerts"``, or ``"settings"``).
 
         Returns:
             None
@@ -92,13 +92,13 @@ class BottomNavSection(Buildable):
         )
 
     def build(self) -> ft.Control:
-        """Construit la barre de navigation avec ses 4 items alignés horizontalement.
+        """Build the navigation bar with its 4 horizontally aligned items.
 
-        Les onglets « Tableau », « Alertes » et « Réglages » sont cliquables et
-        mettent à jour leur état actif. Seul l'onglet Historique est affiché mais inerte.
+        The "Dashboard", "Alerts", and "Settings" tabs are clickable and update
+        their active state. Only the History tab is displayed but inert.
 
         Returns:
-            ft.Control: ``Container`` blanc avec bordure supérieure et 4 items de navigation.
+            ft.Control: White ``Container`` with top border and 4 navigation items.
         """
 
         def on_dashboard_click(_: ft.ControlEvent) -> None:

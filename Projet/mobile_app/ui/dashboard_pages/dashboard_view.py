@@ -1,4 +1,4 @@
-"""Vue dashboard : orchestrateur assemblant le header, les 4 sections et la navigation."""
+"""Dashboard view: orchestrator assembling header, 4 sections, and navigation."""
 
 from __future__ import annotations
 
@@ -23,19 +23,19 @@ from ui.dashboard_pages.treatment_section import TreatmentSection
 
 
 class DashboardView(Buildable):
-    """Orchestrateur principal de la vue dashboard.
+    """Main dashboard view orchestrator.
 
-    Agrège et coordonne cinq composants enfants :
-    - :class:`HeaderSection` : bandeau supérieur (ville, profil, statut Kafka) ;
-    - :class:`CurrentWeatherSection` : météo actuelle et historique ;
-    - :class:`ThiSection` : jauge de stress thermique ;
-    - :class:`PastureSection` : confort au pré ;
-    - :class:`TreatmentSection` : créneaux de pulvérisation ;
-    - :class:`BottomNavSection` : barre de navigation inférieure.
+    Aggregates and coordinates five child components:
+    - :class:`HeaderSection`: top banner (city, profile, Kafka status);
+    - :class:`CurrentWeatherSection`: current weather and history;
+    - :class:`ThiSection`: thermal stress gauge;
+    - :class:`PastureSection`: pasture comfort;
+    - :class:`TreatmentSection`: spraying time slots;
+    - :class:`BottomNavSection`: bottom navigation bar.
 
-    Gère la navigation entre le dashboard, la page Alertes et la page de réglages
-    via la barre inférieure. Expose :meth:`update_weather` et :meth:`set_status`
-    pour les mises à jour en temps réel.
+    Manages navigation between dashboard, Alerts page, and Settings page
+    via the bottom bar. Exposes :meth:`update_weather` and :meth:`set_status`
+    for real-time updates.
     """
 
     def __init__(
@@ -47,20 +47,20 @@ class DashboardView(Buildable):
         on_settings_save: Optional[Callable[[str, str], None]] = None,
         on_language_change: Optional[Callable[[], None]] = None,
     ) -> None:
-        """Instancie chaque sous-section et prépare la zone de contenu permutable.
+        """Instantiate each sub-section and prepare the swappable content area.
 
         Args:
-            city (str): Nom de la ville affiché dans le header.
-            profile (str): Profil utilisateur affiché en sous-titre du header.
-            topic (str): Nom du topic Kafka pour la ligne de statut initiale.
-            notification_service (NotificationService): Service partagé pilotant
-                l'activation et l'envoi des notifications, fourni à la page Alertes.
-            on_settings_save (Callable[[str, str], None] | None): Callback optionnel
-                appelé avec ``(city, profile)`` quand l'utilisateur enregistre ses
-                réglages. Permet à l'orchestrateur parent de relancer le consumer Kafka.
+            city (str): City name displayed in the header.
+            profile (str): User profile displayed as header subtitle.
+            topic (str): Kafka topic name for the initial status line.
+            notification_service (NotificationService): Shared service controlling
+                notification activation and delivery, provided to the Alerts page.
+            on_settings_save (Callable[[str, str], None] | None): Optional callback
+                called with ``(city, profile)`` when the user saves their settings.
+                Allows the parent orchestrator to restart the Kafka consumer.
 
         Returns:
-            None — :meth:`build` doit être appelé pour obtenir le contrôle Flet.
+            None — :meth:`build` must be called to get the Flet control.
         """
         self._current_city = city
         self._current_profile = profile
@@ -129,14 +129,14 @@ class DashboardView(Buildable):
             self._on_settings_save_cb(city, profile)
 
     def build(self) -> ft.Control:
-        """Assemble le header, la zone de contenu permutable et la barre de navigation.
+        """Assemble the header, swappable content area, and navigation bar.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            ft.Control: ``Column`` Flet complète (header + corps + nav) prête
-                à être ajoutée à la page.
+            ft.Control: Complete Flet ``Column`` (header + body + nav) ready
+                to be added to the page.
         """
         return ft.Column(
             [self.header.build(), self._body, self._bottom_nav.build()],
@@ -145,10 +145,10 @@ class DashboardView(Buildable):
         )
 
     def update_weather(self, w: Weather) -> None:
-        """Propage une nouvelle mesure météo à chacune des quatre sections enfants.
+        """Propagate a new weather measurement to each of the four child sections.
 
         Args:
-            w (Weather): La nouvelle mesure météo reçue depuis le consommateur Kafka.
+            w (Weather): The new weather measurement received from the Kafka consumer.
 
         Returns:
             None
@@ -159,15 +159,14 @@ class DashboardView(Buildable):
         self.treatment.update(w)
 
     def reset_data(self) -> None:
-        """Réinitialise les quatre sections à leur état d'attente.
+        """Reset the four sections to their waiting state.
 
-        Vide les données accumulées (historique, alertes, créneaux…) afin de ne pas
-        afficher les mesures de l'ancien lieu après un changement de localisation.
-        Le rafraîchissement réel à l'écran est déclenché par l'appelant via
-        ``page.update()``.
+        Clear accumulated data (history, alerts, slots, etc.) to avoid displaying
+        measurements from the old location after a location change. The actual
+        screen refresh is triggered by the caller via ``page.update()``.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
             None
@@ -178,10 +177,10 @@ class DashboardView(Buildable):
         self.treatment.reset()
 
     def set_status(self, text: str) -> None:
-        """Relaie un message de statut de connexion Kafka au header du dashboard.
+        """Relay a Kafka connection status message to the dashboard header.
 
         Args:
-            text (str): Message de statut à afficher dans le bandeau supérieur.
+            text (str): Status message to display in the top banner.
 
         Returns:
             None

@@ -1,18 +1,17 @@
-"""Petit moteur d'internationalisation (i18n) de l'application.
+"""Lightweight internationalization (i18n) engine for the application.
 
-Charge les traductions depuis ``langues/<langue>/<namespace>.json`` où :
-- ``<langue>`` est un code (``fr``, ``en``, ``es``) ;
-- ``<namespace>`` correspond en général à un fichier d'UI (ex. ``setup_view``).
+Loads translations from ``langues/<language>/<namespace>.json`` where:
+- ``<language>`` is a code (``fr``, ``en``, ``es``);
+- ``<namespace>`` typically corresponds to a UI file (e.g., ``setup_view``).
 
-Principes :
-- aucune dépendance à Flet : le module peut être appelé depuis n'importe quel
-  thread (y compris la boucle de polling de l'API) ;
-- repli systématique : si une clé/un fichier/une langue manque, on retombe sur
-  le français puis, en dernier recours, sur la clé elle-même — jamais d'exception
-  côté interface ;
-- la langue choisie est persistée dans le dossier de données de l'application
-  (même logique que :class:`NotificationService`) afin d'être rechargée au
-  prochain démarrage.
+Principles:
+- no Flet dependency: the module can be called from any thread (including
+  the API polling loop);
+- systematic fallback: if a key/file/language is missing, it falls back to
+  French, and as a last resort to the key itself — never raises an exception
+  on the UI side;
+- the chosen language is persisted in the application data folder (same logic
+  as :class:`NotificationService`) to be reloaded on the next startup.
 """
 
 from __future__ import annotations
@@ -21,39 +20,39 @@ import json
 import os
 from pathlib import Path
 
-#: Langue par défaut et langue de repli pour toute clé manquante.
+#: Default language and fallback language for any missing key.
 DEFAULT_LANG = "fr"
 
-#: Codes de langue disponibles → nom affiché dans le sélecteur (nom natif).
+#: Available language codes → name displayed in the selector (native name).
 LANGUAGES: dict[str, str] = {
     "fr": "Français",
     "en": "English",
     "es": "Español",
 }
 
-#: Dossier racine des traductions, à côté de ce module.
+#: Root folder for translations, next to this module.
 _LANG_DIR = Path(__file__).resolve().parent / "langues"
 
-#: Cache des namespaces déjà chargés : (langue, namespace) → dict.
+#: Cache of already-loaded namespaces: (language, namespace) → dict.
 _cache: dict[tuple[str, str], dict] = {}
 
-#: Langue active courante (initialisée plus bas depuis la préférence persistée).
+#: Current active language (initialized below from the persisted preference).
 _current_lang = DEFAULT_LANG
 
 
 def _pref_file() -> Path:
-    """Chemin du fichier de préférence de langue dans le dossier de données.
+    """Path to the language preference file in the application data folder.
 
-    ``flet run`` exporte ``FLET_APP_STORAGE_DATA`` vers un répertoire
-    inscriptible (y compris sur Android). En son absence (tests, exécution
-    directe), on retombe sur le dossier personnel de l'utilisateur.
+    ``flet run`` exports ``FLET_APP_STORAGE_DATA`` to a writable directory
+    (including on Android). In its absence (tests, direct execution), falls back
+    to the user's home directory.
     """
     base = os.getenv("FLET_APP_STORAGE_DATA") or os.path.expanduser("~")
     return Path(base) / "meteo_agri_lang.json"
 
 
 def _load_namespace(lang: str, namespace: str) -> dict:
-    """Charge (et met en cache) le fichier JSON d'un namespace pour une langue."""
+    """Load (and cache) the JSON file of a namespace for a language."""
     key = (lang, namespace)
     if key in _cache:
         return _cache[key]
@@ -69,24 +68,24 @@ def _load_namespace(lang: str, namespace: str) -> dict:
 
 
 def _lookup(lang: str, namespace: str, key: str) -> str | None:
-    """Retourne la chaîne brute pour ``(lang, namespace, key)`` ou ``None``."""
+    """Return the raw string for ``(lang, namespace, key)`` or ``None``."""
     value = _load_namespace(lang, namespace).get(key)
     return value if isinstance(value, str) else None
 
 
 def t(namespace: str, key: str, **fmt) -> str:
-    """Retourne la traduction de ``key`` dans ``namespace`` pour la langue active.
+    """Return the translation of ``key`` in ``namespace`` for the active language.
 
     Args:
-        namespace (str): Espace de noms (en général le nom du fichier d'UI).
-        key (str): Identifiant stable de la chaîne (snake_case).
-        **fmt: Valeurs de substitution pour un gabarit ``str.format`` (ex.
+        namespace (str): Namespace (usually the name of the UI file).
+        key (str): Stable identifier for the string (snake_case).
+        **fmt: Substitution values for a ``str.format`` template (e.g.
             ``t("header_section", "connecting", topic="limoges")``).
 
     Returns:
-        str: La chaîne traduite, à défaut sa version française, à défaut ``key``.
-            Les erreurs de formatage sont absorbées (retourne la chaîne non
-            formatée) pour ne jamais casser l'affichage.
+        str: The translated string, falling back to French, then to ``key``.
+            Formatting errors are absorbed (returns the unformatted string)
+            to never break the UI.
     """
     text = _lookup(_current_lang, namespace, key)
     if text is None and _current_lang != DEFAULT_LANG:
@@ -102,11 +101,11 @@ def t(namespace: str, key: str, **fmt) -> str:
 
 
 def tr_list(namespace: str, key: str) -> list:
-    """Retourne une valeur de type liste traduite (ex. noms de jours/mois).
+    """Return a translated list value (e.g. day/month names).
 
-    Repli sur le français si la langue active ne fournit pas la liste, puis sur
-    une liste vide. Utilisé pour les données structurées que :func:`t` (qui ne
-    renvoie que des chaînes) ne sait pas restituer.
+    Falls back to French if the active language doesn't provide the list, then
+    to an empty list. Used for structured data that :func:`t` (which only
+    returns strings) cannot return.
     """
     value = _load_namespace(_current_lang, namespace).get(key)
     if not isinstance(value, list):
@@ -115,21 +114,21 @@ def tr_list(namespace: str, key: str) -> list:
 
 
 def get_language() -> str:
-    """Retourne le code de la langue active (ex. ``"fr"``)."""
+    """Return the code of the active language (e.g. ``"fr"``)."""
     return _current_lang
 
 
 def available() -> dict[str, str]:
-    """Retourne la table ``code → nom natif`` des langues disponibles."""
+    """Return the ``code → native name`` table of available languages."""
     return dict(LANGUAGES)
 
 
 def set_language(code: str) -> None:
-    """Change la langue active et la persiste pour les prochaines sessions.
+    """Change the active language and persist it for future sessions.
 
     Args:
-        code (str): Code de langue (doit appartenir à :data:`LANGUAGES`).
-            Un code inconnu est ignoré silencieusement.
+        code (str): Language code (must be in :data:`LANGUAGES`).
+            An unknown code is silently ignored.
     """
     global _current_lang
     if code not in LANGUAGES:
@@ -138,13 +137,13 @@ def set_language(code: str) -> None:
     try:
         _pref_file().write_text(json.dumps({"language": code}), encoding="utf-8")
     except OSError:
-        # Absence de stockage inscriptible : le changement reste valable pour
-        # la session courante, simplement non persisté.
+        # No writable storage: the change remains valid for the current session
+        # but is not persisted.
         pass
 
 
 def _load_persisted() -> str:
-    """Recharge la langue persistée, ou la langue par défaut le cas échéant."""
+    """Reload the persisted language, or the default language if necessary."""
     try:
         data = json.loads(_pref_file().read_text(encoding="utf-8"))
         stored = data.get("language")
@@ -153,6 +152,5 @@ def _load_persisted() -> str:
     return stored if stored in LANGUAGES else DEFAULT_LANG
 
 
-# Charge la préférence dès l'import afin que la première construction d'UI
-# utilise déjà la bonne langue.
+# Load the preference on import so the first UI construction uses the correct language.
 _current_lang = _load_persisted()

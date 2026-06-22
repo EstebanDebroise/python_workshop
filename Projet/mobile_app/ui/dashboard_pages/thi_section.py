@@ -1,4 +1,4 @@
-"""Section stress thermique : jauge THI circulaire, zone et alertes."""
+"""Thermal stress section: circular THI gauge, comfort zone, and alerts."""
 
 from __future__ import annotations
 
@@ -15,22 +15,22 @@ from ui.components import UIComponents
 
 
 class ThiSection(WeatherSection):
-    """Carte de stress thermique affichant la jauge THI, la zone de confort et les alertes.
+    """Thermal stress card displaying THI gauge, comfort zone, and alerts.
 
-    Implémente :class:`WeatherSection`. Le THI (Temperature Humidity Index) est
-    recalculé à chaque mesure. La jauge circulaire, le badge de zone et les
-    bandeaux d'alerte (danger uniquement) sont mis à jour en place.
-    La zone d'alerte est masquée par défaut et n'apparaît qu'en cas de danger.
+    Implements :class:`WeatherSection`. The THI (Temperature Humidity Index)
+    is recalculated with each measurement. The circular gauge, zone badge, and
+    alert banners (danger only) are updated in-place. The alert zone is hidden
+    by default and only appears in case of danger.
     """
 
     def __init__(self) -> None:
-        """Prépare la jauge circulaire, les libellés de zone et la zone d'alerte cachée.
+        """Prepare the circular gauge, zone labels, and hidden alert zone.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            None — :meth:`build` doit être appelé pour obtenir le contrôle Flet.
+            None — :meth:`build` must be called to get the Flet control.
         """
         self.badge = Badge("—", "ok")
         self._value = ft.Text("--", size=22, weight=ft.FontWeight.BOLD, color=theme.RED, text_align=ft.TextAlign.CENTER)
@@ -47,18 +47,18 @@ class ThiSection(WeatherSection):
         self._alert_zone = ft.Container(visible=False)
 
     def build(self) -> ft.Control:
-        """Construit la carte THI avec jauge circulaire, barème de zones et zone d'alertes.
+        """Build the THI card with circular gauge, zone scale, and alert zone.
 
-        La jauge circulaire affiche le THI normalisé sur une plage de 50 à 90.
-        Le barème (Normal → Urgence) est représenté par 5 segments colorés.
-        La zone d'alertes (bandeau rouge + bandeau info) est invisible au démarrage.
+        The circular gauge displays the THI normalized over the range 50 to 90.
+        The zone scale (Normal → Emergency) is represented by 5 colored segments.
+        The alert zone (red banner + info banner) is invisible at startup.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            ft.Control: Carte blanche contenant la jauge THI, les libellés de zone,
-                le barème coloré et la zone d'alertes conditionnelle.
+            ft.Control: White card containing the THI gauge, zone labels,
+                colored scale, and conditional alert zone.
         """
         return UIComponents.card(
             ft.Column(
@@ -130,18 +130,18 @@ class ThiSection(WeatherSection):
         )
 
     def update(self, w: Weather) -> None:
-        """Recalcule le THI, met à jour la jauge et affiche ou masque l'alerte danger.
+        """Recalculate THI, update gauge, and show or hide danger alert.
 
-        Le THI est calculé via :meth:`ThiCalculator.result` à partir de la température
-        et de l'humidité. La jauge est normalisée sur la plage [50, 90]. En zone
-        danger, deux bandeaux d'alerte (rouge + info) apparaissent dans ``_alert_zone``.
+        The THI is calculated via :meth:`ThiCalculator.result` from temperature
+        and humidity. The gauge is normalized over the range [50, 90]. In the
+        danger zone, two alert banners (red + info) appear in ``_alert_zone``.
 
         Args:
-            w (Weather): La nouvelle mesure météo. Les champs ``temperature_c``
-                et ``humidity_pct`` sont utilisés pour le calcul THI.
+            w (Weather): The new weather measurement. The fields ``temperature_c``
+                and ``humidity_pct`` are used for THI calculation.
 
         Returns:
-            None — les contrôles Flet sont modifiés en place.
+            None — the Flet controls are modified in-place.
         """
         result: ThiResult = ThiCalculator.result(w.temperature_c, w.humidity_pct)
         color = UIComponents.COLOR_TOKENS[result.color_token]
@@ -174,13 +174,13 @@ class ThiSection(WeatherSection):
             self._alert_zone.visible = False
 
     def reset(self) -> None:
-        """Remet la jauge THI, la zone de confort et l'alerte à leur état d'attente.
+        """Reset the THI gauge, comfort zone, and alert to waiting state.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            None — les contrôles Flet sont modifiés en place.
+            None — the Flet controls are modified in-place.
         """
         self._value.value = "--"
         self._value.color = theme.RED

@@ -8,12 +8,12 @@ ZoneKind = Literal["ok", "warn", "danger"]
 
 @dataclass(frozen=True)
 class ThiResult:
-    """Résultat d'un calcul THI.
+    """Result of a THI calculation.
 
-    ``code`` est un identifiant stable de zone (``confort``, ``vigilance``,
-    ``alerte``, ``danger``, ``urgence``) servant à retrouver les libellés
-    traduits côté interface (namespace ``thi_section``). La couche métier ne
-    porte donc plus de texte affichable.
+    ``code`` is a stable zone identifier (``confort``, ``vigilance``,
+    ``alerte``, ``danger``, ``urgence``) used to find translated labels on the
+    UI side (namespace ``thi_section``). The business layer no longer carries
+    displayable text.
     """
 
     value: float

@@ -1,4 +1,4 @@
-"""Section header du dashboard : bandeau vert supérieur."""
+"""Dashboard header section: top green banner."""
 
 from __future__ import annotations
 
@@ -10,31 +10,31 @@ from ui.base import Buildable
 
 
 def _profile_label(profile: str) -> str:
-    """Traduit un code de profil (ex. ``"dairy"``) en libellé affichable."""
+    """Translate a profile code (e.g. ``"dairy"``) to a displayable label."""
     return t("common", f"profile_{profile}")
 
 
 class HeaderSection(Buildable):
-    """Bandeau vert supérieur affichant la ville, le profil utilisateur et le statut Kafka.
+    """Top green banner displaying city, user profile, and Kafka connection status.
 
-    Implémente :class:`Buildable`. Le statut de connexion Kafka peut être mis à jour
-    dynamiquement via :meth:`set_status` sans reconstruire toute la section,
-    ce qui permet d'afficher en temps réel « Flux actif », les erreurs, etc.
+    Implements :class:`Buildable`. The Kafka connection status can be updated
+    dynamically via :meth:`set_status` without rebuilding the entire section,
+    allowing real-time display of "Active Feed", errors, etc.
     """
 
     def __init__(self, city: str, profile: str, topic: str) -> None:
-        """Mémorise les libellés fixes et prépare le contrôle texte de statut modifiable.
+        """Store fixed labels and prepare the modifiable status text control.
 
         Args:
-            city (str): Nom de la ville affiché en grand dans l'en-tête
-                (ex. ``"Limoges"``).
-            profile (str): Profil de l'utilisateur affiché en sous-titre
-                (ex. ``"Éleveur laitier"``).
-            topic (str): Nom du topic Kafka affiché dans la ligne de statut initiale
-                (ex. ``"limoges"``).
+            city (str): City name displayed large in the header
+                (e.g. ``"Limoges"``).
+            profile (str): User profile displayed as subtitle
+                (e.g. ``"Dairy Farmer"``).
+            topic (str): Kafka topic name displayed in the initial status line
+                (e.g. ``"limoges"``).
 
         Returns:
-            None — :meth:`build` doit être appelé pour obtenir le contrôle Flet.
+            None — :meth:`build` must be called to get the Flet control.
         """
         self.city = city
         self.profile = profile
@@ -57,18 +57,18 @@ class HeaderSection(Buildable):
         )
 
     def build(self) -> ft.Control:
-        """Construit l'arbre Flet complet du bandeau supérieur.
+        """Build the complete Flet tree for the top banner.
 
-        Produit un ``Container`` vert contenant sur une ligne : icône de localisation,
-        nom de ville, profil et avatar ; et sur une deuxième ligne : point de statut
-        et texte de connexion Kafka.
+        Produces a green ``Container`` containing on one line: location icon,
+        city name, profile, and avatar; and on a second line: status dot
+        and Kafka connection text.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            ft.Control: ``Container`` vert (``theme.GREEN``) prêt à être inséré
-                en haut du dashboard.
+            ft.Control: Green ``Container`` (``theme.GREEN``) ready to be inserted
+                at the top of the dashboard.
         """
         return ft.Container(
             bgcolor=theme.GREEN,
@@ -123,15 +123,15 @@ class HeaderSection(Buildable):
         )
 
     def set_status(self, text: str) -> None:
-        """Met à jour le texte de statut de connexion Kafka en place.
+        """Update the Kafka connection status text in-place.
 
-        Modifie directement la valeur du contrôle ``_status`` sans reconstruire
-        le header. L'appelant doit appeler ``page.update()`` pour que le
-        changement soit visible à l'écran.
+        Directly modifies the ``_status`` control value without rebuilding the
+        header. The caller must call ``page.update()`` for the change to become
+        visible on screen.
 
         Args:
-            text (str): Nouveau message de statut à afficher
-                (ex. ``"Flux actif · 14 mesures reçues"``, message d'erreur).
+            text (str): New status message to display
+                (e.g. ``"Active Feed · 14 measurements received"``, error message).
 
         Returns:
             None
@@ -139,15 +139,15 @@ class HeaderSection(Buildable):
         self._status.value = text
 
     def update_info(self, city: str, profile: str, topic: str) -> None:
-        """Met à jour la ville, le profil et le topic affichés dans le header.
+        """Update the city, profile, and topic displayed in the header.
 
-        Modifie les contrôles texte en place. L'appelant doit appeler
-        ``page.update()`` pour que les changements soient visibles.
+        Modifies the text controls in-place. The caller must call
+        ``page.update()`` for the changes to become visible.
 
         Args:
-            city (str): Nouveau nom de ville.
-            profile (str): Nouveau profil utilisateur.
-            topic (str): Nouveau topic Kafka pour la ligne de statut.
+            city (str): New city name.
+            profile (str): New user profile.
+            topic (str): New Kafka topic for the status line.
 
         Returns:
             None

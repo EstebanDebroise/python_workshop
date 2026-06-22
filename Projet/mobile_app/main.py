@@ -71,8 +71,7 @@ class WeatherApp:
         self.dashboard: DashboardView | None = None
         self.client: ApiWeatherClient | None = None
         self.notifications = NotificationService(page)
-        # État de l'écran courant, pour pouvoir le reconstruire lors d'un
-        # changement de langue. ``None`` tant que rien n'est affiché.
+        # Current screen state to rebuild when language changes. ``None`` until something is displayed.
         self._screen: str | None = None
         self._screen_args: tuple = ()
         self._configure_page()
@@ -123,12 +122,12 @@ class WeatherApp:
         self.page.update()
 
     def _rebuild_current(self) -> None:
-        """Reconstruit l'écran courant dans la langue active.
+        """Rebuild the current screen in the active language.
 
-        Appelé après un changement de langue depuis le sélecteur. Sur le
-        dashboard, réapplique la dernière mesure connue (``prev_weather``) pour
-        ne pas perdre l'affichage en attendant le prochain relevé. Le client
-        d'API n'est pas redémarré : seule l'interface est reconstruite.
+        Called after a language change from the selector. On the dashboard,
+        reapplies the last known measurement (``prev_weather``) to not lose
+        the display while waiting for the next reading. The API client is not
+        restarted: only the UI is rebuilt.
         """
         if self._screen == "setup":
             self._show_setup()

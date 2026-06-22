@@ -8,11 +8,11 @@ PastureKind = Literal["cold", "sun", "warn"]
 
 @dataclass(frozen=True)
 class PastureAlert:
-    """Alerte de pâturage.
+    """Pasture alert.
 
-    ``code`` identifie le message traduit (namespace ``pasture_section``) et
-    ``params`` fournit les valeurs de substitution éventuelles du gabarit
-    (ex. ``{"feels": "-4"}``). La couche métier ne porte plus de texte affichable.
+    ``code`` identifies the translated message (namespace ``pasture_section``)
+    and ``params`` provides any template substitution values (e.g. ``{"feels": "-4"}``).
+    The business layer no longer carries displayable text.
     """
 
     icon: str

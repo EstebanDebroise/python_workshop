@@ -1,4 +1,4 @@
-"""Composant Badge : pastille colorée à texte et couleur dynamiques."""
+"""Badge component: colored pill with dynamic text and color."""
 
 from __future__ import annotations
 
@@ -8,29 +8,29 @@ import theme
 
 
 class Badge:
-    """Pastille colorée dont le libellé et la couleur évoluent dynamiquement.
+    """Colored pill with dynamically evolving label and color.
 
-    Encapsule un ``Container`` Flet en exposant uniquement un ``kind`` sémantique
-    (``ok``, ``warn``, ``danger``) plutôt que des couleurs hexadécimales brutes.
-    La palette est résolue à partir de :data:`theme.BADGE_PALETTE`.
+    Wraps a Flet ``Container`` exposing only a semantic ``kind`` (``ok``, ``warn``,
+    ``danger``) rather than raw hexadecimal colors. The palette is resolved from
+    :data:`theme.BADGE_PALETTE`.
 
-    Attributs publics :
-        control (ft.Container): Le contrôle Flet sous-jacent, à insérer dans la
-            hiérarchie parente. Ne pas recréer ce contrôle — modifier via :meth:`update`.
+    Public Attributes:
+        control (ft.Container): The underlying Flet control, to be inserted in the
+            parent hierarchy. Do not recreate this control — modify via :meth:`update`.
     """
 
     def __init__(self, text: str = "—", kind: str = "ok") -> None:
-        """Crée la pastille avec un libellé et une catégorie initiaux.
+        """Create the badge with an initial label and category.
 
         Args:
-            text (str): Libellé textuel initial affiché dans la pastille.
-                        Défaut : ``"—"``.
-            kind (str): Catégorie sémantique parmi ``"ok"``, ``"warn"``, ``"danger"``.
-                        Détermine les couleurs du fond et du texte.
-                        Défaut : ``"ok"``.
+            text (str): Initial textual label displayed in the badge.
+                        Default: ``"—"``.
+            kind (str): Semantic category among ``"ok"``, ``"warn"``, ``"danger"``.
+                        Determines the background and text colors.
+                        Default: ``"ok"``.
 
         Returns:
-            None — le contrôle Flet est disponible immédiatement via ``self.control``.
+            None — the Flet control is immediately available via ``self.control``.
         """
         bg, fg = theme.BADGE_PALETTE[kind]
         self._label = ft.Text(text, size=10, weight=ft.FontWeight.W_500, color=fg)
@@ -42,15 +42,15 @@ class Badge:
         )
 
     def update(self, text: str, kind: str) -> None:
-        """Met à jour le libellé et les couleurs du badge selon un nouveau ``kind``.
+        """Update the badge label and colors according to a new ``kind``.
 
-        Le contrôle Flet est modifié en place. L'appelant doit ensuite appeler
-        ``page.update()`` pour que le changement soit visible à l'écran.
+        The Flet control is modified in-place. The caller must then call
+        ``page.update()`` for the change to become visible on screen.
 
         Args:
-            text (str): Nouveau libellé à afficher dans la pastille.
-            kind (str): Nouvelle catégorie parmi ``"ok"``, ``"warn"``, ``"danger"``.
-                        Détermine les nouvelles couleurs de fond et de texte.
+            text (str): New label to display in the badge.
+            kind (str): New category among ``"ok"``, ``"warn"``, ``"danger"``.
+                        Determines the new background and text colors.
 
         Returns:
             None

@@ -1,4 +1,4 @@
-"""Section pulvérisation et traitement : créneaux horaires évalués et légende."""
+"""Spraying and treatment section: evaluated time slots and legend."""
 
 from __future__ import annotations
 
@@ -15,37 +15,37 @@ from ui.components import UIComponents
 
 
 class TreatmentSection(WeatherSection):
-    """Carte de pulvérisation affichant 3 créneaux horaires évalués et leur légende.
+    """Spraying card displaying 3 evaluated time slots and their legend.
 
-    Implémente :class:`WeatherSection`. Les créneaux (−2h / maintenant / +3h)
-    sont recalculés à chaque nouvelle mesure via :func:`TreatmentAnalyzer.slots`.
-    Chaque créneau est affiché avec un code couleur (optimal / risqué / déconseillé).
-    Le badge récapitule le nombre de créneaux jugés optimaux.
+    Implements :class:`WeatherSection`. The time slots (−2h / now / +3h) are
+    recalculated with each new measurement via :func:`TreatmentAnalyzer.slots`.
+    Each slot is displayed with a color code (optimal / risky / discouraged).
+    The badge summarizes the number of slots deemed optimal.
     """
 
     def __init__(self) -> None:
-        """Initialise la colonne de créneaux vide et le badge récapitulatif.
+        """Initialize the empty slot column and summary badge.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            None — :meth:`build` doit être appelé pour obtenir le contrôle Flet.
+            None — :meth:`build` must be called to get the Flet control.
         """
         self.badge = Badge("—", "ok")
         self._slots = ft.Column([], spacing=6)
 
     def build(self) -> ft.Control:
-        """Construit la carte avec titre, liste de créneaux dynamique et légende des couleurs.
+        """Build the card with title, dynamic slot list, and color legend.
 
-        La colonne ``_slots`` est insérée vide ; elle sera remplie par :meth:`update`.
-        La légende (Optimal / Risqué / Déconseillé) est statique.
+        The ``_slots`` column is inserted empty; it will be filled by :meth:`update`.
+        The legend (Optimal / Risky / Discouraged) is static.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            ft.Control: Carte blanche avec le titre, la liste des créneaux et la légende.
+            ft.Control: White card with title, slot list, and legend.
         """
         return UIComponents.card(
             ft.Column(
@@ -94,19 +94,19 @@ class TreatmentSection(WeatherSection):
         )
 
     def update(self, w: Weather) -> None:
-        """Recalcule les 3 créneaux de pulvérisation et met à jour le badge récapitulatif.
+        """Recalculate the 3 spraying slots and update the summary badge.
 
-        Délègue le calcul à :func:`TreatmentAnalyzer.slots` puis reconstruit
-        la liste des lignes visuelles via :meth:`_render_slot`. Le badge affiche
-        le nombre de créneaux optimaux ou « AUCUN » si aucun n'est disponible.
+        Delegates calculation to :func:`TreatmentAnalyzer.slots` then rebuilds
+        the list of visual lines via :meth:`_render_slot`. The badge displays
+        the number of optimal slots or "NONE" if no optimal slots are available.
 
         Args:
-            w (Weather): La nouvelle mesure météo servant de base au calcul.
-                Les champs ``wind_speed_ms``, ``rain_1h_mm`` et ``temperature_c``
-                sont utilisés pour évaluer chaque créneau.
+            w (Weather): The new weather measurement used as the basis for calculation.
+                The fields ``wind_speed_ms``, ``rain_1h_mm``, and ``temperature_c``
+                are used to evaluate each slot.
 
         Returns:
-            None — les contrôles Flet sont modifiés en place.
+            None — the Flet controls are modified in-place.
         """
         slots = TreatmentAnalyzer.slots(w)
         self._slots.controls = [self._render_slot(s) for s in slots]
@@ -117,31 +117,31 @@ class TreatmentSection(WeatherSection):
             self.badge.update(t("treatment_section", "badge_none"), "danger")
 
     def reset(self) -> None:
-        """Vide la liste des créneaux et remet le badge à son état d'attente.
+        """Clear the slot list and reset the badge to waiting state.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            None — les contrôles Flet sont modifiés en place.
+            None — the Flet controls are modified in-place.
         """
         self._slots.controls = []
         self.badge.update("—", "ok")
 
     @staticmethod
     def _render_slot(s: TreatmentSlot) -> ft.Container:
-        """Construit la ligne visuelle d'un créneau avec son code couleur.
+        """Build the visual line of a time slot with its color code.
 
-        Le fond, la bordure et la pastille sont déterminés par le statut du créneau :
-        ``"ok"`` → vert, ``"warn"`` → ambre, ``"no"`` → rouge.
+        Background, border, and dot are determined by the slot status:
+        ``"ok"`` → green, ``"warn"`` → amber, ``"no"`` → red.
 
         Args:
-            s (TreatmentSlot): Créneau horaire avec ses attributs : ``label`` (plage horaire),
-                ``wind`` (m/s), ``rain`` (mm), ``temp`` (°C) et ``status`` (ok/warn/no).
+            s (TreatmentSlot): Time slot with its attributes: ``label`` (time range),
+                ``wind`` (m/s), ``rain`` (mm), ``temp`` (°C), and ``status`` (ok/warn/no).
 
         Returns:
-            ft.Container: Ligne stylisée contenant le label horaire, les indicateurs
-                météo (vent, pluie, température) et la pastille de statut.
+            ft.Container: Styled line containing the time label, weather indicators
+                (wind, rain, temperature), and status dot.
         """
         styles = {
             "ok": (theme.GREEN_LIGHT, "#F0FDF4", "#BBF7D0"),

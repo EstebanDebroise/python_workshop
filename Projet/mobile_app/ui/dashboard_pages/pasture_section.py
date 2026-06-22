@@ -1,4 +1,4 @@
-"""Section confort au pré : 4 indicateurs météo et alertes de pâturage."""
+"""Pasture comfort section: 4 weather indicators and pasture alerts."""
 
 from __future__ import annotations
 
@@ -17,23 +17,23 @@ from ui.components import UIComponents
 
 
 class PastureSection(WeatherSection):
-    """Carte de confort au pré affichant 4 indicateurs et les alertes animales.
+    """Pasture comfort card displaying 4 indicators and animal alerts.
 
-    Implémente :class:`WeatherSection`. Affiche température réelle, ressenti,
-    vitesse du vent et couverture nuageuse dans une grille 2×2. Une ligne
-    contextuelle apparaît quand l'écart ressenti/réel dépasse 2°C. Les alertes
-    métier (froid, ensoleillement, canicule) sont rendues sous forme de bandeaux.
-    Le badge indique le niveau global de vigilance (OK ou VIGILANCE).
+    Implements :class:`WeatherSection`. Displays actual temperature, feels-like,
+    wind speed, and cloud coverage in a 2×2 grid. A contextual line appears when
+    the feels-like/actual temperature gap exceeds 2°C. Business alerts (cold,
+    sunshine, heat) are rendered as banners. The badge indicates overall alert level
+    (OK or VIGILANCE).
     """
 
     def __init__(self) -> None:
-        """Prépare la grille de statistiques et les conteneurs d'alertes initialement vides.
+        """Prepare the statistics grid and initially empty alert containers.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            None — :meth:`build` doit être appelé pour obtenir le contrôle Flet.
+            None — :meth:`build` must be called to get the Flet control.
         """
         self.badge = Badge("—", "ok")
         self._temp = ft.Text("--", size=18, weight=ft.FontWeight.BOLD)
@@ -44,17 +44,17 @@ class PastureSection(WeatherSection):
         self._alerts = ft.Column([], spacing=6)
 
     def build(self) -> ft.Control:
-        """Construit la carte avec titre, grille 2×2, ligne ressenti et zone d'alertes.
+        """Build the card with title, 2×2 grid, feels-like line, and alert zone.
 
-        La ligne ressenti (``_feels_row``) et la colonne d'alertes (``_alerts``)
-        sont insérées vides et seront remplies dynamiquement par :meth:`update`.
+        The feels-like line (``_feels_row``) and alert column (``_alerts``)
+        are inserted empty and will be filled dynamically by :meth:`update`.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            ft.Control: Carte blanche avec grille de statistiques, ligne contextuelle
-                et zone d'alertes de pâturage.
+            ft.Control: White card with statistics grid, contextual line,
+                and pasture alert zone.
         """
         return UIComponents.card(
             ft.Column(
@@ -88,19 +88,19 @@ class PastureSection(WeatherSection):
         )
 
     def update(self, w: Weather) -> None:
-        """Met à jour les 4 indicateurs, la ligne ressenti et les alertes de pâturage.
+        """Update the 4 indicators, feels-like line, and pasture alerts.
 
-        Si l'écart entre ressenti et température réelle est ≥ 2°C, une ligne
-        contextuelle est affichée. Les alertes métier sont recalculées via
-        :func:`PastureAnalyzer.alerts` et rendues via :meth:`_render_pasture_alerts`.
-        Le badge passe à VIGILANCE dès qu'au moins une alerte est présente.
+        If the gap between feels-like and actual temperature is ≥ 2°C, a contextual
+        line is displayed. Business alerts are recalculated via :func:`PastureAnalyzer.alerts`
+        and rendered via :meth:`_render_pasture_alerts`. The badge switches to VIGILANCE
+        as soon as at least one alert is present.
 
         Args:
-            w (Weather): La nouvelle mesure météo. Les champs ``temperature_c``,
-                ``feels_like_c``, ``wind_speed_ms`` et ``clouds_pct`` sont utilisés.
+            w (Weather): The new weather measurement. The fields ``temperature_c``,
+                ``feels_like_c``, ``wind_speed_ms``, and ``clouds_pct`` are used.
 
         Returns:
-            None — les contrôles Flet sont modifiés en place.
+            None — the Flet controls are modified in-place.
         """
         self._temp.value = f"{w.temperature_c:.0f}"
         self._feels.value = f"{w.feels_like_c:.0f}"
@@ -148,13 +148,13 @@ class PastureSection(WeatherSection):
             self.badge.update(t("pasture_section", "badge_warning"), "warn")
 
     def reset(self) -> None:
-        """Remet les 4 indicateurs, la ligne ressenti et les alertes à leur état d'attente.
+        """Reset the 4 indicators, feels-like line, and alerts to waiting state.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            None — les contrôles Flet sont modifiés en place.
+            None — the Flet controls are modified in-place.
         """
         self._temp.value = "--"
         self._feels.value = "--"
@@ -166,17 +166,17 @@ class PastureSection(WeatherSection):
 
     @staticmethod
     def _render_pasture_alerts(alerts: Iterable[PastureAlert]) -> Iterable[ft.Control]:
-        """Convertit une liste d'alertes métier en bandeaux Flet colorés selon leur type.
+        """Convert a list of business alerts to colored Flet banners by type.
 
-        Dispatche chaque alerte vers le helper visuel correspondant selon son ``kind`` :
-        ``"cold"`` → bandeau bleu, ``"sun"`` → bandeau jaune, autre → bandeau ambre.
+        Dispatch each alert to the corresponding visual helper based on its ``kind``:
+        ``"cold"`` → blue banner, ``"sun"`` → yellow banner, other → amber banner.
 
         Args:
-            alerts (Iterable[PastureAlert]): Alertes issues de :func:`PastureAnalyzer.alerts`,
-                chacune portant un ``icon``, un ``message`` et un ``kind``.
+            alerts (Iterable[PastureAlert]): Alerts from :func:`PastureAnalyzer.alerts`,
+                each carrying an ``icon``, a ``message``, and a ``kind``.
 
         Returns:
-            Iterable[ft.Control]: Générateur de bandeaux Flet, un par alerte.
+            Iterable[ft.Control]: Generator of Flet banners, one per alert.
         """
         for a in alerts:
             icon = UIComponents.icon_name(a.icon)

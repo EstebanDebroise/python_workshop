@@ -1,8 +1,8 @@
-"""Classes de base abstraites pour les composants de l'interface utilisateur.
+"""Abstract base classes for UI components.
 
-Définit les deux interfaces fondamentales de l'application :
-- :class:`Buildable` pour tout composant capable de se construire en contrôle Flet.
-- :class:`WeatherSection` pour les sections du dashboard réactives aux mesures météo.
+Defines the two fundamental interfaces of the application:
+- :class:`Buildable` for any component capable of building itself into a Flet control.
+- :class:`WeatherSection` for dashboard sections reactive to weather measurements.
 """
 
 from __future__ import annotations
@@ -15,52 +15,52 @@ from models import Weather
 
 
 class Buildable(ABC):
-    """Interface de base pour tout composant capable de produire un contrôle Flet.
+    """Base interface for any component capable of producing a Flet control.
 
-    Toutes les vues et sections de l'application héritent de cette classe
-    afin de garantir un contrat uniforme d'affichage. Aucune logique n'est
-    fournie ici : chaque sous-classe est responsable de sa propre construction.
+    All views and sections of the application inherit from this class to ensure
+    a uniform display contract. No logic is provided here: each subclass is
+    responsible for its own construction.
     """
 
     @abstractmethod
     def build(self) -> ft.Control:
-        """Construit et retourne l'arbre de contrôles Flet du composant.
+        """Build and return the Flet control tree for the component.
 
-        Cette méthode doit être appelée une seule fois au moment où le composant
-        est ajouté à la page ou à son parent. Les mises à jour ultérieures se font
-        via des modifications en place sur les contrôles internes.
+        This method should be called only once when the component is added to
+        the page or its parent. Later updates are done via in-place modifications
+        of the internal controls.
 
         Args:
-            Aucun.
+            None.
 
         Returns:
-            ft.Control: Le contrôle Flet racine du composant, prêt à être inséré
-                dans la hiérarchie de la page.
+            ft.Control: The root Flet control of the component, ready to be
+                inserted into the page hierarchy.
         """
 
 
 class WeatherSection(Buildable):
-    """Interface des sections du dashboard réactives aux mesures météo.
+    """Interface for dashboard sections reactive to weather measurements.
 
-    Étend :class:`Buildable` en ajoutant la méthode :meth:`update` qui permet
-    à chaque section de se rafraîchir à la réception d'une nouvelle mesure
-    météo provenant du consommateur Kafka.
+    Extends :class:`Buildable` by adding the :meth:`update` method that allows
+    each section to refresh when a new weather measurement from the Kafka
+    consumer is received.
 
-    Les sections concrètes (:class:`CurrentWeatherSection`, :class:`ThiSection`,
-    :class:`PastureSection`, :class:`TreatmentSection`) héritent de cette classe.
+    Concrete sections (:class:`CurrentWeatherSection`, :class:`ThiSection`,
+    :class:`PastureSection`, :class:`TreatmentSection`) inherit from this class.
     """
 
     @abstractmethod
     def update(self, w: Weather) -> None:
-        """Met à jour l'affichage de la section avec une nouvelle mesure météo.
+        """Update the section display with a new weather measurement.
 
-        Les contrôles Flet internes sont modifiés en place ; la méthode ne
-        reconstruit pas l'arbre. L'appelant est responsable d'appeler
-        ``page.update()`` pour propager les changements à l'écran.
+        Internal Flet controls are modified in-place; the method does not
+        rebuild the tree. The caller is responsible for calling ``page.update()``
+        to propagate the changes to the screen.
 
         Args:
-            w (Weather): La nouvelle mesure météo reçue depuis Kafka, contenant
-                température, humidité, vent et tous les autres indicateurs.
+            w (Weather): The new weather measurement received from Kafka, containing
+                temperature, humidity, wind, and all other indicators.
 
         Returns:
             None
@@ -68,12 +68,12 @@ class WeatherSection(Buildable):
 
     @abstractmethod
     def reset(self) -> None:
-        """Réinitialise la section à son état d'attente (avant toute mesure).
+        """Reset the section to its waiting state (before any measurement).
 
-        Vide les données accumulées (historique, alertes…) et remet les contrôles
-        Flet aux valeurs par défaut affichées au démarrage. Utilisé lors d'un
-        changement de lieu pour ne pas mélanger les données de deux localisations.
-        Les contrôles sont modifiés en place ; l'appelant déclenche ``page.update()``.
+        Clear accumulated data (history, alerts, etc.) and reset Flet controls
+        to default values displayed at startup. Used when changing location to
+        avoid mixing data from two locations. Controls are modified in-place;
+        the caller triggers ``page.update()``.
 
         Returns:
             None

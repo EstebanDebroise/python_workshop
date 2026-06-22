@@ -1,4 +1,4 @@
-"""Sélecteur de langue réutilisable (écran de démarrage et page Réglages)."""
+"""Reusable language selector (startup screen and Settings page)."""
 
 from __future__ import annotations
 
@@ -12,29 +12,28 @@ from ui.base import Buildable
 
 
 class LanguageSelector(Buildable):
-    """Menu déroulant permettant de changer la langue de l'interface.
+    """Dropdown menu to change the interface language.
 
-    Implémente :class:`Buildable`. Liste les langues disponibles
-    (:func:`i18n.available`) et présélectionne la langue active. Lors d'un
-    changement, met à jour la langue courante (:func:`i18n.set_language`, qui
-    la persiste) puis appelle ``on_change`` : l'appelant est responsable de
-    reconstruire l'écran courant pour refléter la nouvelle langue.
+    Implements :class:`Buildable`. Lists available languages (:func:`i18n.available`)
+    and pre-selects the active language. When changed, updates the current language
+    (:func:`i18n.set_language`, which persists it) then calls ``on_change``: the
+    caller is responsible for rebuilding the current screen to reflect the new language.
     """
 
     def __init__(self, on_change: Callable[[], None], *, compact: bool = False) -> None:
-        """Prépare le menu déroulant des langues.
+        """Prepare the language dropdown menu.
 
         Args:
-            on_change (Callable[[], None]): Callback appelé après changement de
-                langue. Doit déclencher la reconstruction de l'écran courant.
-            compact (bool): Si ``True``, affiche un menu étroit sans libellé
-                (adapté à un coin d'écran) ; sinon un menu standard avec libellé.
+            on_change (Callable[[], None]): Callback called after language change.
+                Must trigger the reconstruction of the current screen.
+            compact (bool): If ``True``, display a narrow menu without label
+                (suitable for a screen corner); otherwise a standard menu with label.
         """
         self._on_change = on_change
         self._compact = compact
 
     def build(self) -> ft.Control:
-        """Construit le ``Dropdown`` des langues présélectionné sur la langue active."""
+        """Build the language ``Dropdown`` pre-selected on the active language."""
         options = [
             ft.dropdown.Option(key=code, text=name)
             for code, name in i18n.available().items()
@@ -50,7 +49,7 @@ class LanguageSelector(Buildable):
         )
 
     def _changed(self, e: ft.ControlEvent) -> None:
-        """Applique la langue choisie puis déclenche la reconstruction de l'écran."""
+        """Apply the chosen language then trigger screen reconstruction."""
         code = e.control.value
         if code and code != i18n.get_language():
             i18n.set_language(code)
