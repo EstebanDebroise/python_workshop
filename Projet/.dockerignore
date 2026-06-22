@@ -11,5 +11,6 @@ htmlcov
 api/.pytest_cache
 api/tests
 mobile_app
-producer
+producer/__pycache__
+producer/test
 .env

@@ -21,6 +21,8 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+      KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
+      KAFKA_TOOLS_LOG4J_LOGLEVEL: ERROR
 
   kafka-ui:
     image: kafbat/kafka-ui:latest
@@ -30,6 +32,8 @@ services:
     environment:
       - KAFKA_CLUSTERS_0_NAME=local
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=broker:29092
+      - LOGGING_LEVEL_ROOT=WARN
+      - LOGGING_LEVEL_IO_KAFBAT=WARN
 
   api:
     build:
@@ -38,10 +42,21 @@ services:
     container_name: api
     ports:
       - 8000:8000
-    environment:
-      - KAFKA_BOOTSTRAP=broker:29092
+    env_file:
+      - api/.env
     volumes:
       - ./api/locations.db:/data/locations.db
     depends_on:
       - broker
 
+  producer:
+    build:
+      context: .
+      dockerfile: producer/Dockerfile
+    container_name: producer
+    env_file:
+      - producer/.env
+    environment:
+      - KAFKA_BROKER=broker:29092 # Override the KAFKA_BROKER environment variable to point to the broker service
+    depends_on:
+      - broker

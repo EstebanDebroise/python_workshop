@@ -11,6 +11,8 @@ Lancement (depuis la racine du projet) :
 
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException
 
 from api import config
@@ -24,10 +26,23 @@ from api.schemas import (
     normalize_topic,
 )
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("[INFO] ========================================")
+    print("[INFO]  Météo Agri API starting up...")
+    print(f"[INFO]  Kafka broker : {config.KAFKA_BOOTSTRAP}")
+    print(f"[INFO]  Database     : {config.DB_PATH}")
+    print("[INFO] ========================================")
+    yield
+    print("[INFO] API shutting down.")
+
+
 app = FastAPI(
     title="Météo Agri — API",
     description="Intermédiaire entre l'application mobile et Kafka.",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # Dépendances applicatives instanciées une fois au démarrage du module.
