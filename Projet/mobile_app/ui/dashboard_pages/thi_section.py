@@ -32,7 +32,7 @@ class ThiSection(WeatherSection):
             None — :meth:`build` doit être appelé pour obtenir le contrôle Flet.
         """
         self.badge = Badge("—", "ok")
-        self._value = ft.Text("--", size=22, weight=ft.FontWeight.BOLD, color=theme.RED)
+        self._value = ft.Text("--", size=22, weight=ft.FontWeight.BOLD, color=theme.RED, text_align=ft.TextAlign.CENTER)
         self._ring = ft.ProgressRing(
             value=0,
             width=90,
@@ -78,14 +78,15 @@ class ThiSection(WeatherSection):
                                         content=ft.Column(
                                             [
                                                 self._value,
-                                                ft.Text("THI", size=9, color=theme.MUTED),
+                                                ft.Text("THI", size=9, color=theme.MUTED, text_align=ft.TextAlign.CENTER),
                                             ],
                                             spacing=0,
                                             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                            alignment=ft.MainAxisAlignment.CENTER,
                                         ),
                                         width=90,
                                         height=90,
-                                        alignment=ft.Alignment.CENTER,
+                                        alignment=ft.Alignment(0, 0),
                                     ),
                                 ],
                                 width=90,
