@@ -1,11 +1,3 @@
-"""Lecteur Kafka à la demande : récupère la dernière mesure d'un topic.
-
-Contrairement au consumer en flux continu de l'application d'origine, ce lecteur
-est interrogé ponctuellement par l'API. À chaque appel il se positionne sur le
-dernier offset du topic, renvoie cette mesure, et indique si elle est plus récente
-que la précédente déjà servie (sinon il s'agit de la donnée du précédent offset).
-"""
-
 from __future__ import annotations
 
 import json
@@ -20,14 +12,6 @@ from api import config
 
 
 class KafkaReader:
-    """Lecture ponctuelle du dernier message d'un topic Kafka.
-
-    Une nouvelle connexion ``KafkaConsumer`` est créée à chaque lecture (les
-    consumers ne sont pas sûrs vis-à-vis des threads et les topics changent selon
-    les lieux des utilisateurs). Un dictionnaire interne mémorise, par topic, le
-    timestamp de la dernière mesure servie afin de calculer le drapeau ``is_new``.
-    """
-
     def __init__(
         self,
         bootstrap: str = config.KAFKA_BOOTSTRAP,
@@ -48,22 +32,22 @@ class KafkaReader:
         self._last_ts: dict[str, int] = {}
 
     def read_latest(self, topic: str) -> dict[str, Any]:
-        """Lit la dernière mesure disponible sur ``topic``.
+        """Read the latest available measurement on ``topic``.
 
-        Se positionne sur le dernier offset de chaque partition, récupère le
-        message correspondant et conserve le plus récent (par timestamp Kafka).
-        S'il n'y a aucun message, renvoie un statut ``"empty"``. S'il n'y a rien
-        de nouveau depuis la dernière lecture, renvoie tout de même la mesure du
-        précédent offset avec ``is_new=False``.
+        Positions on the last offset of each partition, fetches the corresponding
+        message and keeps the most recent one (by Kafka timestamp).
+        If there are no messages, returns status ``"empty"``. If there is nothing
+        new since the last read, still returns the previous offset measurement with
+        ``is_new=False``.
 
         Args:
-            topic (str): Nom du topic Kafka à interroger.
+            topic (str): Name of the Kafka topic to query.
 
         Returns:
-            dict[str, Any]: Dictionnaire avec les clés ``status`` (``"ok"`` /
+            dict[str, Any]: Dictionary with keys ``status`` (``"ok"`` /
                 ``"empty"`` / ``"error"``), ``is_new`` (bool), ``offset``
-                (int | None), ``message`` (dict | None) et ``detail`` (str | None).
-                Directement dépliable dans un :class:`~api.schemas.WeatherResponse`.
+                (int | None), ``message`` (dict | None) and ``detail`` (str | None).
+                Directly unpackable into a :class:`~api.schemas.WeatherResponse`.
         """
         consumer: Optional[KafkaConsumer] = None
         try:

@@ -1,14 +1,3 @@
-"""Application FastAPI : intermédiaire entre l'app mobile et Kafka.
-
-Expose trois familles d'endpoints :
-  - santé : ``GET /health`` ;
-  - météo : ``GET /weather/{topic}`` — lit la dernière mesure d'un topic Kafka ;
-  - lieux : ``POST /locations`` (ajout idempotent) et ``GET /locations`` (liste).
-
-Lancement (depuis la racine du projet) :
-    uvicorn api.main:app --reload
-"""
-
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
@@ -40,36 +29,36 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Météo Agri — API",
-    description="Intermédiaire entre l'application mobile et Kafka.",
+    description="Middleware between the mobile app and Kafka.",
     version="1.0.0",
     lifespan=lifespan,
 )
 
-# Dépendances applicatives instanciées une fois au démarrage du module.
+# Application dependencies instantiated once at module startup.
 db = LocationDB(config.DB_PATH)
 reader = KafkaReader()
 
 
 @app.get("/health")
 def health() -> dict[str, str]:
-    """Vérifie que l'API répond. Ne teste pas la connectivité Kafka."""
+    """Checks that the API is responding. Does not test Kafka connectivity."""
     return {"status": "ok"}
 
 
 @app.get("/weather/{topic}", response_model=WeatherResponse)
 def get_weather(topic: str) -> WeatherResponse:
-    """Renvoie la dernière mesure météo disponible pour un topic.
+    """Return the latest available weather measurement for a topic.
 
-    Lit Kafka à la demande : si une mesure plus récente que la précédente est
-    disponible, elle est renvoyée avec ``is_new=True`` ; sinon la mesure du
-    précédent offset est renvoyée avec ``is_new=False``. En l'absence totale de
-    données, ``status`` vaut ``"empty"``.
+    Reads Kafka on demand: if a measurement newer than the previous one is
+    available, it is returned with ``is_new=True``; otherwise the measurement
+    from the previous offset is returned with ``is_new=False``. If no data is
+    available at all, ``status`` is ``"empty"``.
 
     Args:
-        topic (str): Nom du topic Kafka (typiquement la ville normalisée).
+        topic (str): Kafka topic name (typically the normalized city).
 
     Returns:
-        WeatherResponse: Statut de lecture et, le cas échéant, le payload brut.
+        WeatherResponse: Read status and, if applicable, the raw payload.
     """
     result = reader.read_latest(topic)
     return WeatherResponse(topic=topic, **result)
@@ -77,19 +66,20 @@ def get_weather(topic: str) -> WeatherResponse:
 
 @app.post("/locations", response_model=LocationResult, status_code=201)
 def add_location(payload: LocationIn) -> LocationResult:
-    """Ajoute un lieu à la base s'il n'existe pas déjà (idempotent).
+    """Add a location to the database if it does not already exist (idempotent).
 
-    Le topic est dérivé du nom si ``payload.topic`` n'est pas fourni. Si un lieu
-    avec le même topic existe déjà, il est renvoyé tel quel sans duplication.
+    The topic is derived from the name if ``payload.topic`` is not provided. If a
+    location with the same topic already exists, it is returned as-is without
+    duplication.
 
     Args:
-        payload (LocationIn): Lieu à enregistrer (nom, topic optionnel, pays).
+        payload (LocationIn): Location to save (name, optional topic, country).
 
     Returns:
-        LocationResult: Indique si le lieu a été créé et son enregistrement.
+        LocationResult: Indicates whether the location was created and its record.
 
     Raises:
-        HTTPException: 422 si le nom ne produit aucun topic valide.
+        HTTPException: 422 if the name does not produce a valid topic.
     """
     topic = (payload.topic or normalize_topic(payload.name)).strip()
     if not topic:
@@ -100,5 +90,5 @@ def add_location(payload: LocationIn) -> LocationResult:
 
 @app.get("/locations", response_model=list[LocationOut])
 def list_locations() -> list[LocationOut]:
-    """Retourne la liste de tous les lieux enregistrés."""
+    """Returns the list of all registered locations."""
     return db.all()
